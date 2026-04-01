@@ -33,7 +33,7 @@ export default function AdminLayout({ children }) {
         .admin-logout-btn a:hover { color: #ff0000; transform: translateX(5px); }
 
         .admin-main-content { flex: 1; display: flex; flex-direction: column; background-color: #0f0f0f; overflow-y: auto; }
-        .admin-top-header { padding: 20px 40px; background-color: #121212; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .admin-top-header { padding: 20px 40px; background-color: #121212; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; position: relative; top: auto; z-index: auto; width: auto; backdrop-filter: none; box-shadow: none; }
         .admin-top-header h1 { font-size: 20px; color: #fff; }
         .admin-profile { display: flex; align-items: center; gap: 10px; color: #FF8C00; font-weight: bold; }
 
