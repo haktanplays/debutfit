@@ -37,18 +37,18 @@ export default function AdminLayout({ children }) {
         .admin-top-header h1 { font-size: 20px; color: #fff; }
         .admin-profile { display: flex; align-items: center; gap: 10px; color: #FF8C00; font-weight: bold; }
 
-        .admin-page-content { padding: 40px; animation: adminFadeIn 0.4s ease; }
+        .admin-page-content { padding: 40px; animation: adminFadeIn 0.4s ease; overflow-wrap: break-word; word-break: break-word; }
         @keyframes adminFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .section-header h2 { font-size: 28px; color: #fff; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; }
+        .section-header h2 { font-size: 28px; color: #fff; overflow-wrap: break-word; word-break: break-word; }
         .add-btn { background: #FF8C00; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; font-size: 14px; }
         .add-btn:hover { background: #e67e00; }
 
         .data-table { width: 100%; border-collapse: collapse; background: #1a1a1a; border-radius: 8px; overflow: hidden; }
         .data-table th, .data-table td { padding: 15px 20px; text-align: left; border-bottom: 1px solid #333; }
         .data-table th { background: #222; color: #FF8C00; font-weight: 700; text-transform: uppercase; font-size: 13px; }
-        .data-table td { color: #ccc; font-size: 14px; vertical-align: middle; }
+        .data-table td { color: #ccc; font-size: 14px; vertical-align: middle; word-break: break-word; overflow-wrap: break-word; white-space: normal; max-width: 300px; }
         .prog-img-preview { width: 60px; height: 40px; object-fit: cover; border-radius: 4px; }
 
         .action-btns { white-space: nowrap; }
@@ -61,7 +61,7 @@ export default function AdminLayout({ children }) {
 
         .admin-modal { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .admin-modal-content { background: #1a1a1a; padding: 40px; border-radius: 10px; width: 600px; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid #333; }
-        .admin-modal-content h3 { color: #FF8C00; margin-bottom: 25px; font-size: 22px; }
+        .admin-modal-content h3 { color: #FF8C00; margin-bottom: 25px; font-size: 22px; overflow-wrap: break-word; word-break: break-word; }
         .close-modal { position: absolute; top: 15px; right: 20px; color: #aaa; font-size: 28px; cursor: pointer; background: none; border: none; }
         .close-modal:hover { color: #fff; }
 
@@ -113,7 +113,8 @@ export default function AdminLayout({ children }) {
           .admin-page-content { padding: 20px; }
           .section-header { flex-direction: column; align-items: flex-start; gap: 15px; }
           .section-header h2 { font-size: 22px; }
-          .data-table { display: block; width: 100%; overflow-x: auto; white-space: nowrap; }
+          .data-table { display: block; width: 100%; overflow-x: auto; }
+          .data-table td { white-space: normal; max-width: 200px; }
           .admin-modal-content { width: 95%; padding: 20px; margin: 20px auto; }
         }
       `}</style>
