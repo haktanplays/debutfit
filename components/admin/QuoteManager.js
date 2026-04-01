@@ -67,19 +67,20 @@ export default function QuoteManager() {
           style={{ padding: '10px 15px', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff', width: '300px', fontFamily: 'inherit' }}
         />
       </div>
-      <table className="data-table">
+      <div style={{ overflowX: 'auto' }}>
+      <table className="data-table" style={{ minWidth: '1000px' }}>
         <thead>
           <tr>
             <th style={{ width: '10%' }}>Talep Tarihi</th>
-            <th style={{ width: '14%' }}>Isim Soyisim</th>
-            <th style={{ width: '8%' }}>Yas/Cins.</th>
-            <th style={{ width: '12%' }}>Telefon</th>
-            <th style={{ width: '12%' }}>Istenen Paket</th>
-            <th style={{ width: '12%' }}>Kampanya</th>
-            <th style={{ width: '14%' }}>Ek Hizmetler</th>
+            <th style={{ width: '13%' }}>Isim Soyisim</th>
+            <th style={{ width: '7%' }}>Yas/Cins.</th>
+            <th style={{ width: '11%' }}>Telefon</th>
+            <th style={{ width: '11%' }}>Istenen Paket</th>
+            <th style={{ width: '10%' }}>Kampanya</th>
+            <th style={{ width: '13%' }}>Ek Hizmetler</th>
             <th style={{ width: '8%' }}>Ilgilenen</th>
-            <th style={{ width: '5%' }}>Durum</th>
-            <th style={{ width: '5%' }}>Islem</th>
+            <th style={{ width: '7%' }}>Durum</th>
+            <th style={{ width: '10%' }}>Islem</th>
           </tr>
         </thead>
         <tbody>
@@ -119,6 +120,7 @@ export default function QuoteManager() {
           })}
         </tbody>
       </table>
+      </div>
 
       {statusModal && (
         <div className="admin-modal">

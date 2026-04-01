@@ -111,9 +111,9 @@ export default function FormSettings() {
 
   return (
     <>
-      <div className="section-header">
-        <h2>Teklif Formu Secenekleri</h2>
-        <p style={{ color: '#aaa' }}>Fiyat Teklifi Al formunda musteriye sunulacak secenekleri buradan yonetebilirsiniz.</p>
+      <div style={{ marginBottom: '30px' }}>
+        <h2 style={{ fontSize: '24px', color: '#fff', marginBottom: '8px' }}>Teklif Formu Secenekleri</h2>
+        <p style={{ color: '#aaa', fontSize: '14px' }}>Fiyat Teklifi Al formunda musteriye sunulacak secenekleri buradan yonetebilirsiniz.</p>
       </div>
 
       <SettingSection
