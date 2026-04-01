@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useModal } from '@/components/ModalProvider';
+import { createClient } from '@/lib/supabase-client';
 
 export default function LoginModal() {
   const { loginOpen, setLoginOpen } = useModal();
@@ -28,20 +29,23 @@ export default function LoginModal() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const { createClient } = await import('@/lib/supabase-client');
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
-    if (authError) {
+    try {
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      if (authError) {
+        setErrorColor('#FFD700');
+        setError('Hatalı e-posta veya şifre!');
+        setPassword('');
+      } else {
+        setErrorColor('#00C06B');
+        setError('Giriş başarılı! Yönlendiriliyorsunuz...');
+        setTimeout(() => {
+          window.location.href = '/admin';
+        }, 1500);
+      }
+    } catch (err) {
       setErrorColor('#FFD700');
-      setError('Hatalı e-posta veya şifre!');
-      setPassword('');
-    } else {
-      setErrorColor('#00C06B');
-      setError('Giriş başarılı! Yönlendiriliyorsunuz...');
-      setTimeout(() => {
-        router.push('/admin');
-        handleClose();
-      }, 1500);
+      setError('Bağlantı hatası: ' + err.message);
     }
   };
 
