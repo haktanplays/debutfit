@@ -154,8 +154,15 @@ export default function IletisimPage() {
               data-aos="fade-left"
               data-aos-duration="800"
               data-aos-delay="200"
-              dangerouslySetInnerHTML={{ __html: contact.map || '' }}
-            />
+            >
+              {(() => {
+                const match = contact.map?.match(/src="([^"]+)"/);
+                const src = match?.[1];
+                return src?.includes('google.com/maps') ? (
+                  <iframe src={src} width="100%" height="100%" style={{ border: 0, minHeight: '450px' }} allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+                ) : null;
+              })()}
+            </div>
           </div>
         </div>
       </section>

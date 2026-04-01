@@ -45,7 +45,7 @@ export default function LoginModal() {
       }
     } catch (err) {
       setErrorColor('#FFD700');
-      setError('Bağlantı hatası: ' + err.message);
+      setError('Bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };
 
