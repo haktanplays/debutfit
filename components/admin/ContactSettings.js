@@ -1,6 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getJSON, setJSON, KEYS, DEFAULT_CONTACT } from '@/lib/storage';
+import { getSiteSetting, updateSiteSetting } from '@/lib/db';
+
+const DEFAULT_CONTACT = {
+  address: '', phones: [''], whatsapp: '', instagram: 'debutfit', tiktok: 'debutfit', map: '',
+  nav: { google: { active: true, link: '' }, apple: { active: true, link: '' }, yandex: { active: true, link: '' } }
+};
 
 export default function ContactSettings() {
   const [address, setAddress] = useState('');
@@ -15,27 +20,32 @@ export default function ContactSettings() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    const contact = getJSON(KEYS.contact) || DEFAULT_CONTACT;
-    setAddress(contact.address || '');
-    setWhatsapp(contact.whatsapp || '');
-    setInstagram(contact.instagram || 'debutfit');
-    setTiktok(contact.tiktok || 'debutfit');
-    setMap(contact.map || '');
+    async function load() {
+      try {
+        const contact = await getSiteSetting('contact') || DEFAULT_CONTACT;
+        setAddress(contact.address || '');
+        setWhatsapp(contact.whatsapp || '');
+        setInstagram(contact.instagram || 'debutfit');
+        setTiktok(contact.tiktok || 'debutfit');
+        setMap(contact.map || '');
 
-    let phoneArray = [];
-    if (contact.phones && Array.isArray(contact.phones)) {
-      phoneArray = contact.phones;
-    } else if (contact.phone) {
-      phoneArray = [contact.phone];
+        let phoneArray = [];
+        if (contact.phones && Array.isArray(contact.phones)) {
+          phoneArray = contact.phones;
+        } else if (contact.phone) {
+          phoneArray = [contact.phone];
+        }
+        if (phoneArray.length === 0) phoneArray = [''];
+        setPhones(phoneArray);
+
+        const defaultNav = { google: { active: true, link: '' }, apple: { active: true, link: '' }, yandex: { active: true, link: '' } };
+        const navData = contact.nav || defaultNav;
+        setNavGoogle(navData.google || { active: true, link: '' });
+        setNavApple(navData.apple || { active: true, link: '' });
+        setNavYandex(navData.yandex || { active: true, link: '' });
+      } catch (err) { console.error(err); }
     }
-    if (phoneArray.length === 0) phoneArray = [''];
-    setPhones(phoneArray);
-
-    const defaultNav = { google: { active: true, link: '' }, apple: { active: true, link: '' }, yandex: { active: true, link: '' } };
-    const navData = contact.nav || defaultNav;
-    setNavGoogle(navData.google || { active: true, link: '' });
-    setNavApple(navData.apple || { active: true, link: '' });
-    setNavYandex(navData.yandex || { active: true, link: '' });
+    load();
   }, []);
 
   const addPhone = () => setPhones([...phones, '']);
@@ -47,25 +57,27 @@ export default function ContactSettings() {
     setPhones(newPhones);
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    const phonesFiltered = phones.filter(p => p.trim() !== '');
-    const contactData = {
-      address,
-      phones: phonesFiltered,
-      whatsapp,
-      instagram,
-      tiktok,
-      map,
-      nav: {
-        google: navGoogle,
-        apple: navApple,
-        yandex: navYandex,
-      }
-    };
-    setJSON(KEYS.contact, contactData);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      const phonesFiltered = phones.filter(p => p.trim() !== '');
+      const contactData = {
+        address,
+        phones: phonesFiltered,
+        whatsapp,
+        instagram,
+        tiktok,
+        map,
+        nav: {
+          google: navGoogle,
+          apple: navApple,
+          yandex: navYandex,
+        }
+      };
+      await updateSiteSetting('contact', contactData);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) { console.error(err); }
   };
 
   return (

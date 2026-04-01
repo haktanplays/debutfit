@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getJSON, KEYS } from '@/lib/storage';
+import { getPrograms, getPublicUrl } from '@/lib/db';
 
 export default function ProgramlarPage() {
   const [programs, setPrograms] = useState([]);
@@ -8,8 +8,13 @@ export default function ProgramlarPage() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setPrograms(getJSON(KEYS.programs) || []);
-    setLoaded(true);
+    async function load() {
+      try {
+        setPrograms(await getPrograms());
+      } catch (err) { console.error(err); }
+      setLoaded(true);
+    }
+    load();
   }, []);
 
   const toggleFlip = (id) => {
@@ -36,12 +41,12 @@ export default function ProgramlarPage() {
                 <div key={p.id} className={`pg-card ${flipped[p.id] ? 'flipped' : ''}`} onClick={() => toggleFlip(p.id)} data-aos="fade-up" data-aos-delay={String(delay)}>
                   <div className="pg-card-inner">
                     <div className="pg-card-front">
-                      <div className="pg-img"><img src={p.img} alt={p.name} /></div>
+                      <div className="pg-img"><img src={getPublicUrl(p.image_path)} alt={p.name} /></div>
                       <div className="pg-info"><h3>{p.name}</h3></div>
                     </div>
                     <div className="pg-card-back">
                       <h3>{p.name}</h3>
-                      <p>{p.desc}</p>
+                      <p>{p.description}</p>
                     </div>
                   </div>
                 </div>

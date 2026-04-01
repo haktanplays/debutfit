@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getJSON, setJSON, KEYS } from '@/lib/storage';
+import { getSliderItems, insertSliderItem, deleteSliderItem, uploadMedia, deleteMedia, getPublicUrl, getSiteSetting, updateSiteSetting, uploadMediaBlob } from '@/lib/db';
 
 const adminCardStyle = { background: '#1e1e1e', borderRadius: '12px', padding: '30px', border: '1px solid #333', marginBottom: '30px' };
 const adminInputStyle = { width: '100%', padding: '12px', background: '#2a2a2a', border: '1px solid #444', borderRadius: '8px', color: '#fff', fontSize: '14px' };
@@ -14,7 +14,7 @@ const overlayStyle = {
 };
 const modalStyle = { background: '#1e1e1e', borderRadius: '12px', padding: '30px', border: '1px solid #333', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' };
 
-function resizeImage(file, maxW, quality) {
+function resizeToBlob(file, maxW, quality) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -25,18 +25,10 @@ function resizeImage(file, maxW, quality) {
         if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', quality));
+        canvas.toBlob(resolve, 'image/jpeg', quality);
       };
       img.src = e.target.result;
     };
-    reader.readAsDataURL(file);
-  });
-}
-
-function readFileAsBase64(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
     reader.readAsDataURL(file);
   });
 }
@@ -45,26 +37,19 @@ export default function SliderManager() {
   const [items, setItems] = useState([]);
   const [heroBg, setHeroBg] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [title, setTitle] = useState('');
   const [mediaType, setMediaType] = useState('image'); // 'image' or 'video'
   const [error, setError] = useState('');
 
-  const load = () => {
-    setItems(getJSON(KEYS.slider) || []);
-    if (typeof window !== 'undefined') {
-      setHeroBg(localStorage.getItem(KEYS.heroBg) || '');
-    }
+  const load = async () => {
+    const data = await getSliderItems();
+    setItems(data);
+    const heroBgData = await getSiteSetting('hero_bg');
+    setHeroBg(heroBgData?.image_path || '');
   };
 
   useEffect(() => { load(); }, []);
 
-  const saveItems = (newItems) => {
-    setJSON(KEYS.slider, newItems);
-    setItems(newItems);
-  };
-
   const openAddModal = () => {
-    setTitle('');
     setMediaType('image');
     setError('');
     setModalOpen(true);
@@ -76,35 +61,29 @@ export default function SliderManager() {
     const file = fileInput?.files?.[0];
     if (!file) { setError('Please select a file.'); return; }
 
-    let newItem = { id: Date.now(), title };
-
-    if (mediaType === 'video') {
-      if (file.size > 1.5 * 1024 * 1024) {
-        setError('Video must be under 1.5MB.');
-        return;
-      }
-      newItem.video = await readFileAsBase64(file);
-      newItem.img = '';
-    } else {
-      newItem.img = await resizeImage(file, 560, 0.7);
-      newItem.video = '';
-    }
-
-    saveItems([...items, newItem]);
-    setModalOpen(false);
+    try {
+      const filePath = await uploadMedia('slider', file);
+      await insertSliderItem({ media_type: mediaType, file_path: filePath });
+      await load();
+      setModalOpen(false);
+    } catch (err) { setError(err.message); }
   };
 
-  const deleteItem = (id) => {
+  const deleteItem = async (id) => {
     if (!confirm('Delete this slider item?')) return;
-    saveItems(items.filter(i => i.id !== id));
+    const item = items.find(i => i.id === id);
+    if (item?.file_path) await deleteMedia(item.file_path);
+    await deleteSliderItem(id);
+    await load();
   };
 
   const handleHeroBgUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const base64 = await resizeImage(file, 1920, 0.8);
-    localStorage.setItem(KEYS.heroBg, base64);
-    setHeroBg(base64);
+    const blob = await resizeToBlob(file, 1920, 0.8);
+    const path = await uploadMediaBlob('hero', blob, 'jpg');
+    await updateSiteSetting('hero_bg', { image_path: path });
+    setHeroBg(path);
   };
 
   return (
@@ -125,7 +104,6 @@ export default function SliderManager() {
             <thead>
               <tr>
                 <th style={adminThStyle}>Preview</th>
-                <th style={adminThStyle}>Title</th>
                 <th style={adminThStyle}>Type</th>
                 <th style={adminThStyle}>Actions</th>
               </tr>
@@ -134,14 +112,13 @@ export default function SliderManager() {
               {items.map(item => (
                 <tr key={item.id}>
                   <td style={adminTdStyle}>
-                    {item.video ? (
+                    {item.media_type === 'video' ? (
                       <span style={{ background: '#FF8C00', color: '#fff', padding: '4px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: 700 }}>VIDEO</span>
-                    ) : item.img ? (
-                      <img src={item.img} alt="" style={{ width: '80px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
+                    ) : item.file_path ? (
+                      <img src={getPublicUrl(item.file_path)} alt="" style={{ width: '80px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
                     ) : null}
                   </td>
-                  <td style={adminTdStyle}>{item.title || '(no title)'}</td>
-                  <td style={adminTdStyle}>{item.video ? 'Video' : 'Image'}</td>
+                  <td style={adminTdStyle}>{item.media_type === 'video' ? 'Video' : 'Image'}</td>
                   <td style={adminTdStyle}>
                     <button onClick={() => deleteItem(item.id)} style={{ ...adminBtnStyle, background: '#c0392b', padding: '6px 14px', fontSize: '12px' }}>
                       Delete
@@ -159,7 +136,7 @@ export default function SliderManager() {
         <h3 style={{ color: '#FF8C00', fontSize: '16px', marginBottom: '16px' }}>Hero Background</h3>
         {heroBg && (
           <div style={{ marginBottom: '16px' }}>
-            <img src={heroBg} alt="Hero background" style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #333' }} />
+            <img src={getPublicUrl(heroBg)} alt="Hero background" style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #333' }} />
           </div>
         )}
         <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '8px' }}>Upload new hero background image</label>
@@ -173,10 +150,6 @@ export default function SliderManager() {
             <h3 style={{ color: '#FF8C00', fontSize: '18px', marginBottom: '20px' }}>Add Slider Item</h3>
             <form onSubmit={handleAdd}>
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>Title (optional)</label>
-                <input style={adminInputStyle} value={title} onChange={e => setTitle(e.target.value)} placeholder="Slider title" />
-              </div>
-              <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>Media Type</label>
                 <div style={{ display: 'flex', gap: '16px' }}>
                   <label style={{ color: '#ccc', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -189,7 +162,7 @@ export default function SliderManager() {
               </div>
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>
-                  {mediaType === 'video' ? 'Video File (max 1.5MB)' : 'Image File'}
+                  {mediaType === 'video' ? 'Video File' : 'Image File'}
                 </label>
                 <input type="file" accept={mediaType === 'video' ? 'video/*' : 'image/*'} style={{ color: '#ccc', fontSize: '13px' }} />
               </div>

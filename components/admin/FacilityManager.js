@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getJSON, setJSON, KEYS } from '@/lib/storage';
+import { getFacilities, upsertFacility, deleteFacility, uploadMediaBlob, deleteMedia, getPublicUrl } from '@/lib/db';
 
 const adminCardStyle = { background: '#1e1e1e', borderRadius: '12px', padding: '30px', border: '1px solid #333', marginBottom: '30px' };
 const adminInputStyle = { width: '100%', padding: '12px', background: '#2a2a2a', border: '1px solid #444', borderRadius: '8px', color: '#fff', fontSize: '14px' };
@@ -14,7 +14,7 @@ const overlayStyle = {
 };
 const modalStyle = { background: '#1e1e1e', borderRadius: '12px', padding: '30px', border: '1px solid #333', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' };
 
-function resizeImage(file, maxW, quality) {
+function resizeToBlob(file, maxW, quality) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -25,7 +25,7 @@ function resizeImage(file, maxW, quality) {
         if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', quality));
+        canvas.toBlob(resolve, 'image/jpeg', quality);
       };
       img.src = e.target.result;
     };
@@ -41,19 +41,23 @@ export default function FacilityManager() {
   const [desc, setDesc] = useState('');
   const [existingImg, setExistingImg] = useState('');
   const [preview, setPreview] = useState('');
+  const [pendingFile, setPendingFile] = useState(null);
 
-  const load = () => setItems(getJSON(KEYS.tesis) || []);
+  const load = async () => {
+    const data = await getFacilities();
+    setItems(data);
+  };
   useEffect(() => { load(); }, []);
 
   const openModal = (id = null) => {
     if (id) {
-      const item = (getJSON(KEYS.tesis) || []).find(x => x.id === id);
+      const item = items.find(x => x.id === id);
       if (item) {
         setEditId(item.id);
         setTitle(item.title);
-        setDesc(item.desc);
-        setExistingImg(item.img);
-        setPreview(item.img);
+        setDesc(item.description);
+        setExistingImg(item.image_path);
+        setPreview(item.image_path ? getPublicUrl(item.image_path) : '');
       }
     } else {
       setEditId(null);
@@ -62,47 +66,42 @@ export default function FacilityManager() {
       setExistingImg('');
       setPreview('');
     }
+    setPendingFile(null);
     setModalOpen(true);
   };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const resized = await resizeImage(file, 560, 0.7);
-    setPreview(resized);
+    const reader = new FileReader();
+    reader.onload = (ev) => setPreview(ev.target.result);
+    reader.readAsDataURL(file);
+    setPendingFile(file);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    const finalImg = preview || existingImg;
-
-    let list = getJSON(KEYS.tesis) || [];
-    if (editId) {
-      const idx = list.findIndex(x => x.id === editId);
-      if (idx > -1) {
-        list[idx].title = title;
-        list[idx].desc = desc;
-        list[idx].img = finalImg;
-      }
-    } else {
-      list.push({ id: Date.now(), title, desc, img: finalImg });
+    let imagePath = existingImg;
+    if (pendingFile) {
+      const blob = await resizeToBlob(pendingFile, 560, 0.7);
+      imagePath = await uploadMediaBlob('facilities', blob, 'jpg');
     }
 
     try {
-      setJSON(KEYS.tesis, list);
+      await upsertFacility({ id: editId, title, description: desc, image_path: imagePath });
       setModalOpen(false);
-      load();
+      await load();
     } catch {
       alert('Hata: Resim boyutu cok yuksek.');
     }
   };
 
-  const deleteItem = (id) => {
+  const deleteItem = async (id) => {
     if (!confirm('Bu tesisi kalici olarak silmek istediginize emin misiniz?')) return;
-    let list = getJSON(KEYS.tesis) || [];
-    list = list.filter(t => t.id !== id);
-    setJSON(KEYS.tesis, list);
-    load();
+    const item = items.find(x => x.id === id);
+    if (item?.image_path) await deleteMedia(item.image_path);
+    await deleteFacility(id);
+    await load();
   };
 
   return (
@@ -131,10 +130,10 @@ export default function FacilityManager() {
               {items.map(t => (
                 <tr key={t.id}>
                   <td style={adminTdStyle}>
-                    {t.img && <img src={t.img} alt={t.title} style={{ width: '80px', height: '56px', objectFit: 'cover', borderRadius: '4px' }} />}
+                    {t.image_path && <img src={getPublicUrl(t.image_path)} alt={t.title} style={{ width: '80px', height: '56px', objectFit: 'cover', borderRadius: '4px' }} />}
                   </td>
                   <td style={adminTdStyle}><strong>{t.title}</strong></td>
-                  <td style={adminTdStyle}>{t.desc}</td>
+                  <td style={adminTdStyle}>{t.description}</td>
                   <td style={adminTdStyle}>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button onClick={() => openModal(t.id)} style={{ ...adminBtnStyle, padding: '6px 14px', fontSize: '12px', background: '#333' }}>Duzenle</button>

@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { getJSON, setJSON, KEYS } from '@/lib/storage';
+import { getPrograms, upsertProgram, deleteProgram as deleteProgramDb, uploadMediaBlob, deleteMedia, getPublicUrl } from '@/lib/db';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 
@@ -15,8 +15,9 @@ export default function ProgramManager() {
   const imgRef = useRef(null);
   const [showCropper, setShowCropper] = useState(false);
 
-  const loadPrograms = () => {
-    setPrograms(getJSON(KEYS.programs) || []);
+  const loadPrograms = async () => {
+    const data = await getPrograms();
+    setPrograms(data);
   };
 
   useEffect(() => { loadPrograms(); }, []);
@@ -30,13 +31,12 @@ export default function ProgramManager() {
     if (cropperRef.current) { cropperRef.current.destroy(); cropperRef.current = null; }
 
     if (id) {
-      const list = getJSON(KEYS.programs) || [];
-      const p = list.find(x => x.id === id);
+      const p = programs.find(x => x.id === id);
       if (p) {
         setEditId(p.id);
         setName(p.name);
-        setDesc(p.desc);
-        setExistingImg(p.img);
+        setDesc(p.description);
+        setExistingImg(p.image_path);
       }
     }
     setModalOpen(true);
@@ -69,40 +69,30 @@ export default function ProgramManager() {
     reader.readAsDataURL(file);
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    let finalImg = existingImg;
+    let imagePath = existingImg;
     if (cropperRef.current) {
-      finalImg = cropperRef.current.getCroppedCanvas({ width: 560, fillColor: '#fff' }).toDataURL('image/jpeg', 0.7);
-    }
-
-    let list = getJSON(KEYS.programs) || [];
-    if (editId) {
-      const idx = list.findIndex(x => x.id === editId);
-      if (idx > -1) {
-        list[idx].name = name;
-        list[idx].desc = desc;
-        list[idx].img = finalImg;
-      }
-    } else {
-      list.push({ id: Date.now(), name, desc, img: finalImg });
+      const canvas = cropperRef.current.getCroppedCanvas({ width: 560, fillColor: '#fff' });
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.7));
+      imagePath = await uploadMediaBlob('programs', blob, 'jpg');
     }
 
     try {
-      setJSON(KEYS.programs, list);
+      await upsertProgram({ id: editId, name, description: desc, image_path: imagePath });
       closeModal();
-      loadPrograms();
+      await loadPrograms();
     } catch {
       alert('Hata: Resim boyutu cok yuksek.');
     }
   };
 
-  const deleteProgram = (id) => {
+  const handleDelete = async (id) => {
     if (!confirm('Bu programi kalici olarak silmek istediginize emin misiniz?')) return;
-    let list = getJSON(KEYS.programs) || [];
-    list = list.filter(p => p.id !== id);
-    setJSON(KEYS.programs, list);
-    loadPrograms();
+    const p = programs.find(x => x.id === id);
+    if (p?.image_path) await deleteMedia(p.image_path);
+    await deleteProgramDb(id);
+    await loadPrograms();
   };
 
   return (
@@ -126,12 +116,12 @@ export default function ProgramManager() {
         <tbody>
           {programs.map(p => (
             <tr key={p.id}>
-              <td>{p.img && <img src={p.img} className="prog-img-preview" alt={p.name} />}</td>
+              <td>{p.image_path && <img src={getPublicUrl(p.image_path)} className="prog-img-preview" alt={p.name} />}</td>
               <td><strong>{p.name}</strong></td>
-              <td>{p.desc}</td>
+              <td>{p.description}</td>
               <td className="action-btns">
                 <button className="edit-btn" onClick={() => openModal(p.id)}>Duzenle</button>
-                <button className="delete-btn" onClick={() => deleteProgram(p.id)}>Sil</button>
+                <button className="delete-btn" onClick={() => handleDelete(p.id)}>Sil</button>
               </td>
             </tr>
           ))}

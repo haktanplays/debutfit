@@ -1,12 +1,18 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getContact } from '@/lib/storage';
+import { getSiteSetting } from '@/lib/db';
 
 export default function Footer() {
   const [contact, setContact] = useState(null);
 
   useEffect(() => {
-    setContact(getContact());
+    async function load() {
+      try {
+        const contact = await getSiteSetting('contact');
+        setContact(contact);
+      } catch (err) { console.error(err); }
+    }
+    load();
   }, []);
 
   if (!contact) return null;

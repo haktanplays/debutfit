@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useModal } from '@/components/ModalProvider';
-import { getJSON, setJSON, getInt, setInt, KEYS, DEFAULT_DURATIONS } from '@/lib/storage';
+import { getFormOptions, insertQuote, trackClick } from '@/lib/db';
 
 export default function QuoteModal() {
   const { quoteOpen, setQuoteOpen } = useModal();
@@ -18,12 +18,16 @@ export default function QuoteModal() {
   const [campaigns, setCampaigns] = useState([]);
   const [extras, setExtras] = useState([]);
 
-  // Load options from localStorage when modal opens
   useEffect(() => {
     if (quoteOpen) {
-      setDurations(getJSON(KEYS.formDurations) || DEFAULT_DURATIONS);
-      setCampaigns(getJSON(KEYS.formCampaigns) || []);
-      setExtras(getJSON(KEYS.formExtras) || []);
+      async function loadOptions() {
+        try {
+          setDurations(await getFormOptions('duration'));
+          setCampaigns(await getFormOptions('campaign'));
+          setExtras(await getFormOptions('extra'));
+        } catch (err) { console.error(err); }
+      }
+      loadOptions();
     }
   }, [quoteOpen]);
 
@@ -64,42 +68,24 @@ export default function QuoteModal() {
     );
   };
 
-  const handleCallClick = () => {
-    setInt(KEYS.callClicks, getInt(KEYS.callClicks) + 1);
-  };
+  const handleCallClick = () => { trackClick('call'); };
+  const handleWhatsAppClick = () => { trackClick('whatsapp'); };
 
-  const handleWhatsAppClick = () => {
-    setInt(KEYS.wpClicks, getInt(KEYS.wpClicks) + 1);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const now = new Date();
-    const dateStr =
-      now.toLocaleDateString('tr-TR') +
-      ', ' +
-      now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-
-    const newQuote = {
-      id: Date.now(),
-      date: dateStr,
-      name,
-      age,
-      gender,
-      phone: '+90 ' + phone,
-      duration,
-      campaign: selectedCampaign,
-      extras: selectedExtras.join(', '),
-      status: 'new',
-    };
-
-    const quotes = getJSON(KEYS.quotes) || [];
-    quotes.push(newQuote);
-    setJSON(KEYS.quotes, quotes);
-
-    setShowSuccess(true);
-    setTimeout(() => handleClose(), 4000);
+    try {
+      await insertQuote({
+        name,
+        age,
+        gender,
+        phone: '+90 ' + phone,
+        duration,
+        campaign: selectedCampaign,
+        extras: selectedExtras,
+      });
+      setShowSuccess(true);
+      setTimeout(() => handleClose(), 4000);
+    } catch (err) { console.error(err); alert('Bir hata oluştu.'); }
   };
 
   if (!quoteOpen) return null;

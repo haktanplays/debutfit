@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getJSON, setJSON, KEYS } from '@/lib/storage';
+import { getSiteSetting, updateSiteSetting, getFaqItems, upsertFaqItem, deleteFaqItem } from '@/lib/db';
 
 const adminCardStyle = { background: '#1e1e1e', borderRadius: '12px', padding: '30px', border: '1px solid #333', marginBottom: '30px' };
 const adminInputStyle = { width: '100%', padding: '12px', background: '#2a2a2a', border: '1px solid #444', borderRadius: '8px', color: '#fff', fontSize: '14px' };
@@ -28,25 +28,28 @@ export default function AboutFaqManager() {
   const [faqDesc, setFaqDesc] = useState('');
 
   useEffect(() => {
-    const about = getJSON(KEYS.about) || { title: '', desc: '' };
-    setAboutTitle(about.title || '');
-    setAboutDesc(about.desc || '');
-    setFaqs(getJSON(KEYS.faq) || []);
+    async function load() {
+      try {
+        const about = await getSiteSetting('about') || { title: '', desc: '' };
+        setAboutTitle(about.title || '');
+        setAboutDesc(about.desc || '');
+        const faqItems = await getFaqItems();
+        setFaqs(faqItems.map(f => ({ id: f.id, title: f.question, desc: f.answer })));
+      } catch (err) { console.error(err); }
+    }
+    load();
   }, []);
 
   // About handlers
-  const saveAbout = () => {
-    setJSON(KEYS.about, { title: aboutTitle, desc: aboutDesc });
-    setAboutSaved(true);
-    setTimeout(() => setAboutSaved(false), 2000);
+  const saveAbout = async () => {
+    try {
+      await updateSiteSetting('about', { title: aboutTitle, desc: aboutDesc });
+      setAboutSaved(true);
+      setTimeout(() => setAboutSaved(false), 2000);
+    } catch (err) { console.error(err); }
   };
 
   // FAQ handlers
-  const saveFaqs = (newFaqs) => {
-    setJSON(KEYS.faq, newFaqs);
-    setFaqs(newFaqs);
-  };
-
   const openModal = (id = null) => {
     if (id) {
       const item = faqs.find(f => f.id === id);
@@ -63,19 +66,27 @@ export default function AboutFaqManager() {
     setModalOpen(true);
   };
 
-  const handleSaveFaq = () => {
+  const handleSaveFaq = async () => {
     if (!faqTitle.trim()) return;
-    if (editId) {
-      saveFaqs(faqs.map(f => f.id === editId ? { ...f, title: faqTitle, desc: faqDesc } : f));
-    } else {
-      saveFaqs([...faqs, { id: Date.now(), title: faqTitle, desc: faqDesc }]);
-    }
-    setModalOpen(false);
+    try {
+      if (editId) {
+        await upsertFaqItem({ id: editId, question: faqTitle, answer: faqDesc });
+      } else {
+        await upsertFaqItem({ question: faqTitle, answer: faqDesc });
+      }
+      const faqItems = await getFaqItems();
+      setFaqs(faqItems.map(f => ({ id: f.id, title: f.question, desc: f.answer })));
+      setModalOpen(false);
+    } catch (err) { console.error(err); }
   };
 
-  const deleteFaq = (id) => {
+  const handleDeleteFaq = async (id) => {
     if (!confirm('Delete this FAQ item?')) return;
-    saveFaqs(faqs.filter(f => f.id !== id));
+    try {
+      await deleteFaqItem(id);
+      const faqItems = await getFaqItems();
+      setFaqs(faqItems.map(f => ({ id: f.id, title: f.question, desc: f.answer })));
+    } catch (err) { console.error(err); }
   };
 
   const labelStyle = { display: 'block', color: '#FF8C00', fontSize: '13px', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' };
@@ -131,7 +142,7 @@ export default function AboutFaqManager() {
                       <button onClick={() => openModal(faq.id)} style={{ ...adminBtnStyle, padding: '6px 14px', fontSize: '12px', background: '#333' }}>
                         Edit
                       </button>
-                      <button onClick={() => deleteFaq(faq.id)} style={{ ...adminBtnStyle, padding: '6px 14px', fontSize: '12px', background: '#c0392b' }}>
+                      <button onClick={() => handleDeleteFaq(faq.id)} style={{ ...adminBtnStyle, padding: '6px 14px', fontSize: '12px', background: '#c0392b' }}>
                         Delete
                       </button>
                     </div>

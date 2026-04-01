@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
-import { getJSON, KEYS } from '@/lib/storage';
+import { getAlbums, getPublicUrl } from '@/lib/db';
 
 export default function GaleriPage() {
   const [galleries, setGalleries] = useState([]);
@@ -10,14 +10,19 @@ export default function GaleriPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    setGalleries(getJSON(KEYS.galeri) || []);
-    setLoaded(true);
+    async function load() {
+      try {
+        setGalleries(await getAlbums());
+      } catch (err) { console.error(err); }
+      setLoaded(true);
+    }
+    load();
   }, []);
 
   const openLightbox = (albumId) => {
     const album = galleries.find(g => g.id === albumId);
-    if (album && album.photos && album.photos.length > 0) {
-      setCurrentPhotos(album.photos);
+    if (album?.gallery_photos?.length > 0) {
+      setCurrentPhotos(album.gallery_photos.map(p => getPublicUrl(p.file_path)));
       setCurrentIndex(0);
       setLightboxOpen(true);
       document.body.style.overflow = 'hidden';
@@ -66,8 +71,8 @@ export default function GaleriPage() {
             ) : (
               galleries.map((g, index) => {
                 const delay = (index % 3) * 100;
-                const coverImg = g.cover ? g.cover : (g.photos && g.photos.length > 0 ? g.photos[0] : '');
-                const photoCount = g.photos ? g.photos.length : 0;
+                const coverImg = getPublicUrl(g.cover_path || (g.gallery_photos?.[0]?.file_path || ''));
+                const photoCount = g.gallery_photos?.length || 0;
                 return (
                   <div key={g.id} className="album-card" data-aos="fade-up" data-aos-delay={String(delay)} onClick={() => openLightbox(g.id)}>
                     <div className="album-img-wrapper">
@@ -78,7 +83,7 @@ export default function GaleriPage() {
                     </div>
                     <div className="album-content">
                       <h3 className="album-title">{g.title}</h3>
-                      <p className="album-desc">{g.desc}</p>
+                      <p className="album-desc">{g.description}</p>
                       {g.author && (
                         <span className="album-author">
                           <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '5px', verticalAlign: 'middle' }}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>

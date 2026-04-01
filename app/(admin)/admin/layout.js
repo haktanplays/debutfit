@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import Link from 'next/link';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> },
@@ -137,10 +136,16 @@ export default function AdminLayout({ children }) {
             ))}
           </div>
           <div className="admin-logout-btn">
-            <Link href="/">
+            <a href="#" onClick={async (e) => {
+              e.preventDefault();
+              const { createClient } = await import('@/lib/supabase-client');
+              const supabase = createClient();
+              await supabase.auth.signOut();
+              window.location.href = '/';
+            }}>
               <svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              Siteye Don
-            </Link>
+              Cikis Yap
+            </a>
           </div>
         </aside>
 

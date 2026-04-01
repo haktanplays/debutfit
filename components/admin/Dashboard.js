@@ -1,16 +1,20 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getJSON, getInt, KEYS } from '@/lib/storage';
+import { getQuotes, getTrials, getClickCounts } from '@/lib/db';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({ quotes: 0, trials: 0, wp: 0, calls: 0 });
 
   useEffect(() => {
-    const quotes = getJSON(KEYS.quotes) || [];
-    const trials = getJSON(KEYS.trials) || [];
-    const wp = getInt(KEYS.wpClicks);
-    const calls = getInt(KEYS.callClicks);
-    setStats({ quotes: quotes.length, trials: trials.length, wp, calls });
+    async function load() {
+      try {
+        const quotes = await getQuotes();
+        const trials = await getTrials();
+        const { calls, whatsapp } = await getClickCounts();
+        setStats({ quotes: quotes.length, trials: trials.length, wp: whatsapp, calls });
+      } catch (err) { console.error(err); }
+    }
+    load();
   }, []);
 
   return (

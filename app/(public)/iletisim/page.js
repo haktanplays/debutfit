@@ -1,13 +1,19 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getContact, getInt, setInt, KEYS } from '@/lib/storage';
+import { getSiteSetting, trackClick } from '@/lib/db';
 
 export default function IletisimPage() {
   const [contact, setContact] = useState(null);
   const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
-    setContact(getContact());
+    async function load() {
+      try {
+        const contact = await getSiteSetting('contact');
+        setContact(contact);
+      } catch (err) { console.error(err); }
+    }
+    load();
   }, []);
 
   if (!contact) return null;
@@ -24,9 +30,8 @@ export default function IletisimPage() {
     yandex: { active: false, link: '' },
   };
 
-  function trackClick(type) {
-    const key = type === 'wp' ? KEYS.wpClicks : KEYS.callClicks;
-    setInt(key, getInt(key) + 1);
+  function handleTrackClick(type) {
+    trackClick(type === 'wp' ? 'whatsapp' : 'call');
   }
 
   const hasNavOptions =
@@ -85,7 +90,7 @@ export default function IletisimPage() {
                       <a
                         key={i}
                         href={`tel:${cleanPhone}`}
-                        onClick={() => trackClick('call')}
+                        onClick={() => handleTrackClick('call')}
                         style={{ display: 'block', marginBottom: '5px' }}
                       >
                         {p}
@@ -104,7 +109,7 @@ export default function IletisimPage() {
                 </div>
                 <div className="contact-item-text">
                   <h4>WhatsApp</h4>
-                  <a href={`https://wa.me/${cleanWp}`} target="_blank" rel="noopener noreferrer" onClick={() => trackClick('wp')}>
+                  <a href={`https://wa.me/${cleanWp}`} target="_blank" rel="noopener noreferrer" onClick={() => handleTrackClick('wp')}>
                     {"WhatsApp Üzerinden Mesaj Atın"}
                   </a>
                 </div>

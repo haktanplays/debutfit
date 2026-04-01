@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getJSON, setJSON, KEYS } from '@/lib/storage';
+import { getQuotes, updateQuoteStatus, deleteQuote as deleteQuoteDb } from '@/lib/db';
 
 export default function QuoteManager() {
   const [quotes, setQuotes] = useState([]);
@@ -8,9 +8,11 @@ export default function QuoteManager() {
   const [statusModal, setStatusModal] = useState(null); // { id }
   const [handledBy, setHandledBy] = useState('');
 
-  const loadQuotes = () => {
-    const data = getJSON(KEYS.quotes) || [];
-    setQuotes([...data].reverse());
+  const loadQuotes = async () => {
+    try {
+      const data = await getQuotes();
+      setQuotes(data);
+    } catch (err) { console.error(err); }
   };
 
   useEffect(() => { loadQuotes(); }, []);
@@ -20,7 +22,7 @@ export default function QuoteManager() {
     const f = filter.trim().toLowerCase();
     const nameStr = (q.name || '').toLowerCase();
     const phoneStr = (q.phone || '').toLowerCase();
-    const handledStr = (q.handledBy || '').toLowerCase();
+    const handledStr = (q.handled_by || '').toLowerCase();
     return nameStr.includes(f) || phoneStr.includes(f) || handledStr.includes(f);
   });
 
@@ -29,26 +31,28 @@ export default function QuoteManager() {
     setHandledBy('');
   };
 
-  const saveStatus = (e) => {
+  const saveStatus = async (e) => {
     e.preventDefault();
     if (!handledBy.trim()) { alert('Ilgilenen kisi adini girmelisiniz.'); return; }
-    let data = getJSON(KEYS.quotes) || [];
-    const idx = data.findIndex(item => item.id === statusModal.id);
-    if (idx > -1) {
-      data[idx].status = 'called';
-      data[idx].handledBy = handledBy.trim();
-      setJSON(KEYS.quotes, data);
-    }
-    setStatusModal(null);
-    loadQuotes();
+    try {
+      await updateQuoteStatus(statusModal.id, handledBy.trim());
+      setStatusModal(null);
+      await loadQuotes();
+    } catch (err) { console.error(err); }
   };
 
-  const deleteQuote = (id) => {
+  const handleDeleteQuote = async (id) => {
     if (!confirm('Bu talebi kalici olarak silmek istediginize emin misiniz?')) return;
-    let data = getJSON(KEYS.quotes) || [];
-    data = data.filter(item => item.id !== id);
-    setJSON(KEYS.quotes, data);
-    loadQuotes();
+    try {
+      await deleteQuoteDb(id);
+      await loadQuotes();
+    } catch (err) { console.error(err); }
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
   return (
@@ -83,7 +87,7 @@ export default function QuoteManager() {
             const cleanPhone = q.phone ? q.phone.replace(/[^0-9+]/g, '') : '';
             return (
               <tr key={q.id}>
-                <td>{q.date}</td>
+                <td>{formatDate(q.created_at)}</td>
                 <td><strong>{q.name}</strong></td>
                 <td>{q.age} / {q.gender === 'kadin' ? 'Kadin' : 'Erkek'}</td>
                 <td>
@@ -97,7 +101,7 @@ export default function QuoteManager() {
                 <td style={{ fontWeight: 'bold', color: '#fff' }}>{q.duration || '-'}</td>
                 <td style={{ color: '#00C06B', fontWeight: 600 }}>{q.campaign || '-'}</td>
                 <td style={{ fontSize: '12px', color: '#ccc' }}>{q.extras || '-'}</td>
-                <td style={{ color: '#FF8C00', fontWeight: 'bold' }}>{q.handledBy || '-'}</td>
+                <td style={{ color: '#FF8C00', fontWeight: 'bold' }}>{q.handled_by || '-'}</td>
                 <td>
                   {q.status === 'new'
                     ? <span className="status-badge new">Yeni</span>
@@ -108,7 +112,7 @@ export default function QuoteManager() {
                   {q.status === 'new' && (
                     <button className="edit-btn" onClick={() => openStatusModal(q.id)}>Arandi Isaretle</button>
                   )}
-                  <button className="delete-btn" onClick={() => deleteQuote(q.id)}>Sil</button>
+                  <button className="delete-btn" onClick={() => handleDeleteQuote(q.id)}>Sil</button>
                 </td>
               </tr>
             );

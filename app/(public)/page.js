@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useModal } from '@/components/ModalProvider';
-import { getJSON, getString, KEYS } from '@/lib/storage';
+import { getSliderItems, getSiteSetting, getFaqItems, getPublicUrl } from '@/lib/db';
 
 export default function HomePage() {
   const { setQuoteOpen, setTrialOpen } = useModal();
@@ -29,17 +29,28 @@ export default function HomePage() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setHeroBg(getString(KEYS.heroBg) || '');
-    setSlides(getJSON(KEYS.slider) || []);
+    async function load() {
+      try {
+        const heroBgData = await getSiteSetting('hero_bg');
+        setHeroBg(heroBgData.image_path ? getPublicUrl(heroBgData.image_path) : '');
 
-    const about = getJSON(KEYS.about);
-    if (about) {
-      if (about.title) setAboutTitle(about.title);
-      if (about.desc) setAboutDesc(about.desc);
+        const sliderData = await getSliderItems();
+        setSlides(sliderData.map(item => ({
+          type: item.media_type,
+          src: getPublicUrl(item.file_path),
+          title: ''
+        })));
+
+        const about = await getSiteSetting('about');
+        if (about.title) setAboutTitle(about.title);
+        if (about.desc) setAboutDesc(about.desc);
+
+        const faqData = await getFaqItems();
+        setFaqItems(faqData.map(f => ({ q: f.question, a: f.answer })));
+      } catch (err) { console.error(err); }
+      setLoaded(true);
     }
-
-    setFaqItems(getJSON(KEYS.faq) || []);
-    setLoaded(true);
+    load();
   }, []);
 
   // --- Slider auto-advance logic ---

@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getJSON, setJSON, KEYS } from '@/lib/storage';
+import { getTrials, updateTrialStatus, deleteTrial as deleteTrialDb } from '@/lib/db';
 
 export default function TrialManager() {
   const [trials, setTrials] = useState([]);
@@ -8,9 +8,11 @@ export default function TrialManager() {
   const [statusModal, setStatusModal] = useState(null);
   const [handledBy, setHandledBy] = useState('');
 
-  const loadTrials = () => {
-    const data = getJSON(KEYS.trials) || [];
-    setTrials([...data].reverse());
+  const loadTrials = async () => {
+    try {
+      const data = await getTrials();
+      setTrials(data);
+    } catch (err) { console.error(err); }
   };
 
   useEffect(() => { loadTrials(); }, []);
@@ -20,7 +22,7 @@ export default function TrialManager() {
     const f = filter.trim().toLowerCase();
     const nameStr = (t.name || '').toLowerCase();
     const phoneStr = (t.phone || '').toLowerCase();
-    const handledStr = (t.handledBy || '').toLowerCase();
+    const handledStr = (t.handled_by || '').toLowerCase();
     return nameStr.includes(f) || phoneStr.includes(f) || handledStr.includes(f);
   });
 
@@ -29,26 +31,28 @@ export default function TrialManager() {
     setHandledBy('');
   };
 
-  const saveStatus = (e) => {
+  const saveStatus = async (e) => {
     e.preventDefault();
     if (!handledBy.trim()) { alert('Ilgilenen kisi adini girmelisiniz.'); return; }
-    let data = getJSON(KEYS.trials) || [];
-    const idx = data.findIndex(item => item.id === statusModal.id);
-    if (idx > -1) {
-      data[idx].status = 'called';
-      data[idx].handledBy = handledBy.trim();
-      setJSON(KEYS.trials, data);
-    }
-    setStatusModal(null);
-    loadTrials();
+    try {
+      await updateTrialStatus(statusModal.id, handledBy.trim());
+      setStatusModal(null);
+      await loadTrials();
+    } catch (err) { console.error(err); }
   };
 
-  const deleteTrial = (id) => {
+  const handleDeleteTrial = async (id) => {
     if (!confirm('Bu talebi kalici olarak silmek istediginize emin misiniz?')) return;
-    let data = getJSON(KEYS.trials) || [];
-    data = data.filter(item => item.id !== id);
-    setJSON(KEYS.trials, data);
-    loadTrials();
+    try {
+      await deleteTrialDb(id);
+      await loadTrials();
+    } catch (err) { console.error(err); }
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
   return (
@@ -79,12 +83,12 @@ export default function TrialManager() {
         <tbody>
           {filtered.map(t => (
             <tr key={t.id}>
-              <td>{t.requestDate}</td>
+              <td>{formatDate(t.request_date)}</td>
               <td><strong>{t.name}</strong></td>
               <td>{t.gender === 'kadin' ? 'Kadin' : 'Erkek'}</td>
               <td>{t.phone}</td>
-              <td style={{ color: '#fff', fontWeight: 'bold' }}>{t.date}</td>
-              <td style={{ color: '#FF8C00', fontWeight: 'bold' }}>{t.handledBy || '-'}</td>
+              <td style={{ color: '#fff', fontWeight: 'bold' }}>{formatDate(t.trial_date)}</td>
+              <td style={{ color: '#FF8C00', fontWeight: 'bold' }}>{t.handled_by || '-'}</td>
               <td>
                 {t.status === 'new'
                   ? <span className="status-badge new">Yeni</span>
@@ -95,7 +99,7 @@ export default function TrialManager() {
                 {t.status === 'new' && (
                   <button className="edit-btn" onClick={() => openStatusModal(t.id)}>Arandi Isaretle</button>
                 )}
-                <button className="delete-btn" onClick={() => deleteTrial(t.id)}>Sil</button>
+                <button className="delete-btn" onClick={() => handleDeleteTrial(t.id)}>Sil</button>
               </td>
             </tr>
           ))}

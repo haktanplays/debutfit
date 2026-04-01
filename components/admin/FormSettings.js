@@ -1,9 +1,9 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { getJSON, setJSON, KEYS, DEFAULT_DURATIONS } from '@/lib/storage';
+import { getFormOptions, addFormOption, deleteFormOption, reorderFormOptions } from '@/lib/db';
 import Sortable from 'sortablejs';
 
-function SettingSection({ title, placeholder, data, onAdd, onDelete, tbodyId, type }) {
+function SettingSection({ title, placeholder, data, onAdd, onDelete, onReorder, tbodyId, type }) {
   const [inputVal, setInputVal] = useState('');
   const tbodyRef = useRef(null);
 
@@ -14,19 +14,15 @@ function SettingSection({ title, placeholder, data, onAdd, onDelete, tbodyId, ty
         animation: 150,
         ghostClass: 'sortable-ghost',
         onEnd: () => {
-          const key = type === 'duration' ? KEYS.formDurations : (type === 'campaign' ? KEYS.formCampaigns : KEYS.formExtras);
-          const oldData = getJSON(key) || [];
-          const newData = [];
+          const ids = [];
           tbodyRef.current.querySelectorAll('tr[data-id]').forEach(row => {
-            const id = parseInt(row.getAttribute('data-id'));
-            const item = oldData.find(x => x.id === id);
-            if (item) newData.push(item);
+            ids.push(parseInt(row.getAttribute('data-id')));
           });
-          setJSON(key, newData);
+          onReorder(ids);
         }
       });
     }
-  }, [data, type]);
+  }, [data, type, onReorder]);
 
   const handleAdd = () => {
     if (!inputVal.trim()) { alert('Lutfen bu alan icin bir isim girin.'); return; }
@@ -78,31 +74,39 @@ export default function FormSettings() {
   const [campaigns, setCampaigns] = useState([]);
   const [extras, setExtras] = useState([]);
 
-  const loadAll = () => {
-    let d = getJSON(KEYS.formDurations) || DEFAULT_DURATIONS;
-    setJSON(KEYS.formDurations, d);
-    setDurations(d);
-    setCampaigns(getJSON(KEYS.formCampaigns) || []);
-    setExtras(getJSON(KEYS.formExtras) || []);
+  const loadAll = async () => {
+    try {
+      const d = await getFormOptions('duration');
+      setDurations(d);
+      const c = await getFormOptions('campaign');
+      setCampaigns(c);
+      const e = await getFormOptions('extra');
+      setExtras(e);
+    } catch (err) { console.error(err); }
   };
 
   useEffect(() => { loadAll(); }, []);
 
-  const addSetting = (type, name) => {
-    const key = type === 'duration' ? KEYS.formDurations : (type === 'campaign' ? KEYS.formCampaigns : KEYS.formExtras);
-    let data = getJSON(key) || [];
-    data.push({ id: Date.now(), name });
-    setJSON(key, data);
-    loadAll();
+  const handleAdd = async (type, name) => {
+    try {
+      await addFormOption(type, name);
+      await loadAll();
+    } catch (err) { console.error(err); }
   };
 
-  const deleteSetting = (type, id) => {
+  const handleDelete = async (type, id) => {
     if (!confirm('Bu secenegi silmek istediginize emin misiniz?')) return;
-    const key = type === 'duration' ? KEYS.formDurations : (type === 'campaign' ? KEYS.formCampaigns : KEYS.formExtras);
-    let data = getJSON(key) || [];
-    data = data.filter(item => item.id !== id);
-    setJSON(key, data);
-    loadAll();
+    try {
+      await deleteFormOption(id);
+      await loadAll();
+    } catch (err) { console.error(err); }
+  };
+
+  const handleReorder = async (ids) => {
+    try {
+      await reorderFormOptions(ids);
+      await loadAll();
+    } catch (err) { console.error(err); }
   };
 
   return (
@@ -116,8 +120,9 @@ export default function FormSettings() {
         title="Istenen Uyelik Sureleri (Aylar)"
         placeholder="Orn: 6 Aylik Uyelik"
         data={durations}
-        onAdd={(name) => addSetting('duration', name)}
-        onDelete={(id) => deleteSetting('duration', id)}
+        onAdd={(name) => handleAdd('duration', name)}
+        onDelete={(id) => handleDelete('duration', id)}
+        onReorder={handleReorder}
         tbodyId="durationsTableBody"
         type="duration"
       />
@@ -125,8 +130,9 @@ export default function FormSettings() {
         title="Kampanyalar (Tekli Secim)"
         placeholder="Orn: Ogrenci Indirimi (%15)"
         data={campaigns}
-        onAdd={(name) => addSetting('campaign', name)}
-        onDelete={(id) => deleteSetting('campaign', id)}
+        onAdd={(name) => handleAdd('campaign', name)}
+        onDelete={(id) => handleDelete('campaign', id)}
+        onReorder={handleReorder}
         tbodyId="campaignsTableBody"
         type="campaign"
       />
@@ -134,8 +140,9 @@ export default function FormSettings() {
         title="Ek Dersler ve Hizmetler (Coklu Secim)"
         placeholder="Orn: Personal Training (PT)"
         data={extras}
-        onAdd={(name) => addSetting('extra', name)}
-        onDelete={(id) => deleteSetting('extra', id)}
+        onAdd={(name) => handleAdd('extra', name)}
+        onDelete={(id) => handleDelete('extra', id)}
+        onReorder={handleReorder}
         tbodyId="extrasTableBody"
         type="extra"
       />

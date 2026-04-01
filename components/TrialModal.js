@@ -1,7 +1,7 @@
 'use client';
 import { useState, useMemo } from 'react';
 import { useModal } from '@/components/ModalProvider';
-import { getJSON, setJSON, KEYS } from '@/lib/storage';
+import { insertTrial } from '@/lib/db';
 
 export default function TrialModal() {
   const { trialOpen, setTrialOpen } = useModal();
@@ -52,31 +52,13 @@ export default function TrialModal() {
     setPhone(e.target.value.replace(/[^0-9+]/g, ''));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const now = new Date();
-    const requestDateStr =
-      now.toLocaleDateString('tr-TR') +
-      ', ' +
-      now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-
-    const newTrial = {
-      id: Date.now(),
-      requestDate: requestDateStr,
-      name,
-      gender,
-      phone,
-      date,
-      status: 'new',
-    };
-
-    const trials = getJSON(KEYS.trials) || [];
-    trials.push(newTrial);
-    setJSON(KEYS.trials, trials);
-
-    setShowSuccess(true);
-    setTimeout(() => handleClose(), 4000);
+    try {
+      await insertTrial({ name, gender, phone, trial_date: date });
+      setShowSuccess(true);
+      setTimeout(() => handleClose(), 4000);
+    } catch (err) { console.error(err); alert('Bir hata oluştu.'); }
   };
 
   if (!trialOpen) return null;

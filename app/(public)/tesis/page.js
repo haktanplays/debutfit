@@ -1,14 +1,19 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getJSON, KEYS } from '@/lib/storage';
+import { getFacilities, getPublicUrl } from '@/lib/db';
 
 export default function TesisPage() {
   const [tesisList, setTesisList] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setTesisList(getJSON(KEYS.tesis) || []);
-    setLoaded(true);
+    async function load() {
+      try {
+        setTesisList(await getFacilities());
+      } catch (err) { console.error(err); }
+      setLoaded(true);
+    }
+    load();
   }, []);
 
   if (!loaded) return null;
@@ -28,10 +33,10 @@ export default function TesisPage() {
             {tesisList.map((t, index) => (
               <div key={t.id} className="tesis-grid-item" data-aos="fade-up" data-aos-delay={String((index % 2) * 100)}>
                 <div className="tesis-grid-photo">
-                  <img src={t.img} alt={t.title} />
+                  <img src={getPublicUrl(t.image_path)} alt={t.title} />
                 </div>
                 <h3 className="tesis-grid-title">{t.title}</h3>
-                <p className="tesis-grid-desc">{t.desc}</p>
+                <p className="tesis-grid-desc">{t.description}</p>
               </div>
             ))}
           </div>
