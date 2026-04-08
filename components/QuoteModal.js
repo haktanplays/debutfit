@@ -13,6 +13,7 @@ export default function QuoteModal() {
   const [selectedCampaign, setSelectedCampaign] = useState('');
   const [selectedExtras, setSelectedExtras] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const [durations, setDurations] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
@@ -73,6 +74,7 @@ export default function QuoteModal() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       await insertQuote({
         name,
@@ -85,19 +87,19 @@ export default function QuoteModal() {
       });
       setShowSuccess(true);
       setTimeout(() => handleClose(), 4000);
-    } catch (err) { console.error(err); alert('Bir hata oluştu.'); }
+    } catch (err) { console.error(err); alert('Bir hata oluştu.'); } finally { setSubmitting(false); }
   };
 
   if (!quoteOpen) return null;
 
   return (
-    <div className="modal" style={{ display: 'flex' }} onClick={handleBackdropClick}>
+    <div className="modal" style={{ display: 'flex' }} role="dialog" aria-modal="true" aria-labelledby="quote-modal-title" onClick={handleBackdropClick}>
       <div className="modal-content quote-modal-content">
-        <span className="close quote-close" onClick={handleClose}>&times;</span>
+        <button className="close quote-close" type="button" aria-label="Kapat" onClick={handleClose}>&times;</button>
 
         {/* Direct Contact Section */}
         <div className="direct-contact-section">
-          <h2 className="gradient-text-modal" style={{ fontSize: '26px', marginBottom: '25px' }}>
+          <h2 id="quote-modal-title" className="gradient-text-modal" style={{ fontSize: '26px', marginBottom: '25px' }}>
             Bizimle İletişime Geç
           </h2>
           <div className="contact-buttons">
@@ -223,7 +225,7 @@ export default function QuoteModal() {
                 </div>
               )}
 
-              <button type="submit" className="login-submit-btn" style={{ marginTop: '20px' }}>Teklif Al</button>
+              <button type="submit" className="login-submit-btn" style={{ marginTop: '20px' }} disabled={submitting}>{submitting ? 'Gönderiliyor...' : 'Teklif Al'}</button>
             </form>
           )}
         </div>

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { getSliderItems, insertSliderItem, deleteSliderItem, uploadMedia, deleteMedia, getPublicUrl, getSiteSetting, updateSiteSetting, uploadMediaBlob } from '@/lib/db';
+import { resizeToBlob } from '@/lib/imageUtils';
 
 const adminCardStyle = { background: '#1e1e1e', borderRadius: '12px', padding: '30px', border: '1px solid #333', marginBottom: '30px' };
 const adminInputStyle = { width: '100%', padding: '12px', background: '#2a2a2a', border: '1px solid #444', borderRadius: '8px', color: '#fff', fontSize: '14px' };
@@ -13,25 +14,6 @@ const overlayStyle = {
   display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
 };
 const modalStyle = { background: '#1e1e1e', borderRadius: '12px', padding: '30px', border: '1px solid #333', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' };
-
-function resizeToBlob(file, maxW, quality) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let w = img.width, h = img.height;
-        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        canvas.toBlob(resolve, 'image/jpeg', quality);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
 
 export default function SliderManager() {
   const [items, setItems] = useState([]);

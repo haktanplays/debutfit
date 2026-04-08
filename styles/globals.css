@@ -14,7 +14,11 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Montserrat', sans-serif;
-    
+}
+
+*:focus-visible {
+    outline: 2px solid var(--accent-orange);
+    outline-offset: 2px;
 }
 
 body {
@@ -184,8 +188,8 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 
 /* --- Ortak Modal (Açılır Pencere) ve Arka Plan --- */
 .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.92); align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.modal-content { background: #1a1a1a; padding: 50px; border-radius: 20px; width: 420px; text-align: center; position: relative; box-shadow: 0 0 40px -10px var(--accent-orange); border: 1px solid rgba(255,255,255,0.05); }
-.quote-modal-content { width: 500px; padding: 40px; }
+.modal-content { background: #1a1a1a; padding: 40px; border-radius: 20px; width: min(90vw, 420px); text-align: center; position: relative; box-shadow: 0 0 40px -10px var(--accent-orange); border: 1px solid rgba(255,255,255,0.05); }
+.quote-modal-content { width: min(90vw, 500px); padding: 35px; }
 .modal-logo { height: 70px; width: auto; margin-bottom: 25px; }
 
 /* --- FORM KONTROLLERİ (INPUT VE SELECT) BİRLEŞTİRİLDİ VE TEMİZLENDİ --- */
@@ -250,7 +254,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 
 .login-submit-btn { width: 100%; padding: 15px; background: var(--accent-orange); color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; }
 .login-submit-btn:hover { background: #e67e00; }
-.close { position: absolute; top: 20px; right: 25px; color: #777; font-size: 36px; font-weight: bold; cursor: pointer; transition: color 0.3s; }
+.close { position: absolute; top: 20px; right: 25px; color: #777; font-size: 36px; font-weight: bold; cursor: pointer; transition: color 0.3s; background: none; border: none; line-height: 1; }
 .close:hover { color: var(--accent-orange); }
 .error { color: var(--accent-yellow); font-size: 14px; margin-bottom: 20px; display: none; font-weight: 600; }
 
@@ -874,6 +878,9 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     font-weight: 300;
     cursor: pointer;
     transition: color 0.3s;
+    background: none;
+    border: none;
+    line-height: 1;
 }
 
 .close-lightbox:hover { color: var(--accent-orange); }
@@ -1357,4 +1364,36 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
         text-align: center;
         gap: 10px;
     }
+}
+
+/* --- 576px ALTI MOBIL UYUMLULUK --- */
+@media (max-width: 576px) {
+    .hero { padding: 120px 20px 40px 20px; }
+    .modern-title { font-size: 32px; }
+    .hero-text p { font-size: 16px; margin-bottom: 25px; }
+    .hero-buttons { flex-direction: column; gap: 15px; align-items: center; }
+    .facility-section { padding: 60px 20px; }
+    .services-summary-section { padding: 50px 20px 60px 20px; }
+    .section-header { margin-bottom: 40px; }
+    .section-header h2 { font-size: 28px; letter-spacing: 1px; }
+    .section-header p { font-size: 15px; }
+    #heroSliderContainer { height: auto; min-height: 280px; }
+    .hero-slider-wrapper { height: 280px; }
+    .faq-title { padding: 16px 15px; font-size: 16px; }
+    .faq-content p { padding: 0 15px 20px 15px; font-size: 14px; }
+    .slider-arrow { width: 44px; height: 44px; font-size: 18px; }
+    .contact-btn { padding: 14px; min-height: 44px; }
+    .footer-grid { grid-template-columns: 1fr; text-align: center; gap: 35px; }
+    .footer-socials { justify-content: center; }
+    .footer-logo { align-self: center; }
+    .contact-info-card { padding: 30px 20px; }
+    .contact-page-section { padding-bottom: 50px; }
+    .logo-img { height: 40px; transform: scale(1); }
+    .modal-content { padding: 25px 20px; }
+    .quote-modal-content { padding: 25px 20px; }
+    .gradient-text-modal { font-size: 24px; }
+    .service-card { height: 300px; }
+    .pg-card { height: 280px; }
+    .tesis-grid-photo { height: 220px; }
+    .contact-grid { gap: 30px; }
 }

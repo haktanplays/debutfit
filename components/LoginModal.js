@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useModal } from '@/components/ModalProvider';
 import { createClient } from '@/lib/supabase-client';
 
@@ -56,13 +57,13 @@ export default function LoginModal() {
   if (!loginOpen) return null;
 
   return (
-    <div className="modal" style={{ display: 'flex' }} onClick={handleBackdropClick}>
+    <div className="modal" style={{ display: 'flex' }} role="dialog" aria-modal="true" aria-labelledby="login-modal-title" onClick={handleBackdropClick}>
       <div className="modal-content">
-        <span className="close" onClick={handleClose}>&times;</span>
+        <button className="close" type="button" aria-label="Kapat" onClick={handleClose}>&times;</button>
         <div className="modal-logo-container">
-          <img src="/images/DEBUTFiT.png" alt="DebutFit Club Logo" className="modal-logo" />
+          <Image src="/images/DEBUTFiT.png" alt="DebutFit Club Logo" className="modal-logo" width={200} height={70} />
         </div>
-        <h2 className="gradient-text-modal">Yönetici Girişi</h2>
+        <h2 id="login-modal-title" className="gradient-text-modal">Yönetici Girişi</h2>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <input type="email" ref={emailRef} value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="off" />

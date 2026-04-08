@@ -4,8 +4,19 @@ import AosInit from '@/components/AosInit';
 import ModalProvider from '@/components/ModalProvider';
 
 export const metadata = {
-  title: 'DebutFit Club | Sınırlarını Zorla',
-  description: 'Premium fitness ve yaşam tarzı merkezi',
+  title: {
+    default: 'DebutFit Club | Sınırlarını Zorla',
+    template: '%s | DebutFit Club',
+  },
+  description: 'Premium fitness ve yaşam tarzı merkezi. Fitness, yoga, pilates, kick boks ve personal training.',
+  keywords: ['fitness', 'spor salonu', 'gym', 'yoga', 'pilates', 'kick boks', 'personal training', 'istanbul', 'atakent', 'debutfit'],
+  openGraph: {
+    title: 'DebutFit Club | Sınırlarını Zorla',
+    description: 'Premium fitness ve yaşam tarzı merkezi',
+    type: 'website',
+    locale: 'tr_TR',
+    siteName: 'DebutFit Club',
+  },
 };
 
 export default function RootLayout({ children }) {

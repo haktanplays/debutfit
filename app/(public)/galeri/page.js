@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { getAlbums, getPublicUrl } from '@/lib/db';
 
 export default function GaleriPage() {
@@ -75,8 +76,8 @@ export default function GaleriPage() {
                 const photoCount = g.gallery_photos?.length || 0;
                 return (
                   <div key={g.id} className="album-card" data-aos="fade-up" data-aos-delay={String(delay)} onClick={() => openLightbox(g.id)}>
-                    <div className="album-img-wrapper">
-                      <img src={coverImg} alt={g.title} />
+                    <div className="album-img-wrapper" style={{ position: 'relative' }}>
+                      <Image src={coverImg} alt={g.title} fill sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 33vw" style={{ objectFit: 'cover' }} />
                       <div className="album-overlay">
                         <span>{photoCount} Fotoğrafı Gör</span>
                       </div>
@@ -100,11 +101,11 @@ export default function GaleriPage() {
       </section>
 
       {lightboxOpen && (
-        <div className="lightbox" style={{ display: 'flex' }}>
-          <span className="close-lightbox" onClick={closeLightbox}>&times;</span>
-          <button className="lb-nav prev" onClick={() => changePhoto(-1)}>&#10094;</button>
+        <div className="lightbox" style={{ display: 'flex' }} role="dialog" aria-modal="true" aria-label="Fotoğraf görüntüleyici">
+          <button className="close-lightbox" type="button" aria-label="Galeriyi kapat" onClick={closeLightbox}>&times;</button>
+          <button className="lb-nav prev" aria-label="Önceki fotoğraf" onClick={() => changePhoto(-1)}>&#10094;</button>
           <img id="lightboxImage" src={currentPhotos[currentIndex]} alt="Galeri Fotoğrafı" />
-          <button className="lb-nav next" onClick={() => changePhoto(1)}>&#10095;</button>
+          <button className="lb-nav next" aria-label="Sonraki fotoğraf" onClick={() => changePhoto(1)}>&#10095;</button>
           <div className="lb-counter">{currentIndex + 1} / {currentPhotos.length}</div>
         </div>
       )}

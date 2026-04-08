@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { getFacilities, getPublicUrl } from '@/lib/db';
 
 export default function TesisPage() {
@@ -32,8 +33,8 @@ export default function TesisPage() {
           <div className="tesis-2col-grid">
             {tesisList.map((t, index) => (
               <div key={t.id} className="tesis-grid-item" data-aos="fade-up" data-aos-delay={String((index % 2) * 100)}>
-                <div className="tesis-grid-photo">
-                  <img src={getPublicUrl(t.image_path)} alt={t.title} />
+                <div className="tesis-grid-photo" style={{ position: 'relative' }}>
+                  <Image src={getPublicUrl(t.image_path)} alt={t.title} fill sizes="(max-width: 992px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
                 </div>
                 <h3 className="tesis-grid-title">{t.title}</h3>
                 <p className="tesis-grid-desc">{t.description}</p>

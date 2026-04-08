@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { getPrograms, getPublicUrl } from '@/lib/db';
 
 export default function ProgramlarPage() {
@@ -41,7 +42,7 @@ export default function ProgramlarPage() {
                 <div key={p.id} className={`pg-card ${flipped[p.id] ? 'flipped' : ''}`} onClick={() => toggleFlip(p.id)} data-aos="fade-up" data-aos-delay={String(delay)}>
                   <div className="pg-card-inner">
                     <div className="pg-card-front">
-                      <div className="pg-img"><img src={getPublicUrl(p.image_path)} alt={p.name} /></div>
+                      <div className="pg-img" style={{ position: 'relative' }}><Image src={getPublicUrl(p.image_path)} alt={p.name} fill sizes="(max-width: 576px) 100vw, (max-width: 1200px) 33vw, 25vw" style={{ objectFit: 'cover' }} /></div>
                       <div className="pg-info"><h3>{p.name}</h3></div>
                     </div>
                     <div className="pg-card-back">

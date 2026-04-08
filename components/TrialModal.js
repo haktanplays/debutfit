@@ -10,6 +10,7 @@ export default function TrialModal() {
   const [phone, setPhone] = useState('');
   const [date, setDate] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // Generate 7-day date options starting from today
   const dateOptions = useMemo(() => {
@@ -54,22 +55,23 @@ export default function TrialModal() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       await insertTrial({ name, gender, phone, trial_date: date });
       setShowSuccess(true);
       setTimeout(() => handleClose(), 4000);
-    } catch (err) { console.error(err); alert('Bir hata oluştu.'); }
+    } catch (err) { console.error(err); alert('Bir hata oluştu.'); } finally { setSubmitting(false); }
   };
 
   if (!trialOpen) return null;
 
   return (
-    <div className="modal" style={{ display: 'flex' }} onClick={handleBackdropClick}>
+    <div className="modal" style={{ display: 'flex' }} role="dialog" aria-modal="true" aria-labelledby="trial-modal-title" onClick={handleBackdropClick}>
       <div className="modal-content quote-modal-content">
-        <span className="close trial-close" onClick={handleClose}>&times;</span>
+        <button className="close trial-close" type="button" aria-label="Kapat" onClick={handleClose}>&times;</button>
 
         <div className="lead-form-section">
-          <h2 className="gradient-text-modal" style={{ fontSize: '28px', marginBottom: '10px' }}>
+          <h2 id="trial-modal-title" className="gradient-text-modal" style={{ fontSize: '28px', marginBottom: '10px' }}>
             Tesisimizi Deneyin
           </h2>
           <p style={{ color: '#ccc', marginBottom: '30px', fontSize: '15px' }}>
@@ -123,7 +125,7 @@ export default function TrialModal() {
                 <span className="bar"></span>
               </div>
 
-              <button type="submit" className="login-submit-btn">Randevu Al</button>
+              <button type="submit" className="login-submit-btn" disabled={submitting}>{submitting ? 'Gönderiliyor...' : 'Randevu Al'}</button>
             </form>
           )}
         </div>

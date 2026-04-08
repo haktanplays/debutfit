@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useModal } from '@/components/ModalProvider';
 import { getSliderItems, getSiteSetting, getFaqItems, getPublicUrl } from '@/lib/db';
 
@@ -183,13 +184,16 @@ export default function HomePage() {
                           src={slide.src}
                           muted
                           playsInline
+                          preload="none"
                           style={{ width: '100%', display: 'block', borderRadius: 'inherit' }}
                         />
                       ) : (
-                        <img
+                        <Image
                           src={slide.src}
-                          alt={slide.title || ''}
-                          style={{ width: '100%', display: 'block', borderRadius: 'inherit' }}
+                          alt={slide.title || 'DebutFit'}
+                          fill
+                          sizes="420px"
+                          style={{ objectFit: 'cover', borderRadius: 'inherit' }}
                         />
                       )}
                       {slide.title && (
@@ -206,6 +210,7 @@ export default function HomePage() {
                   <>
                     <button
                       className="slider-arrow slider-prev"
+                      aria-label="Önceki slayt"
                       onClick={() => {
                         setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
                       }}
@@ -214,6 +219,7 @@ export default function HomePage() {
                     </button>
                     <button
                       className="slider-arrow slider-next"
+                      aria-label="Sonraki slayt"
                       onClick={() => {
                         setCurrentSlide((prev) => (prev + 1) % slides.length);
                       }}
@@ -227,9 +233,10 @@ export default function HomePage() {
                 {slides.length > 1 && (
                   <div className="slider-dots">
                     {slides.map((_, i) => (
-                      <span
+                      <button
                         key={i}
                         className={`dot${i === currentSlide ? ' active' : ''}`}
+                        aria-label={`Slayt ${i + 1}`}
                         onClick={() => setCurrentSlide(i)}
                       />
                     ))}
@@ -258,13 +265,18 @@ export default function HomePage() {
               <div
                 key={index}
                 className={`faq-item${faqOpen[index] ? ' open' : ''}`}
-                onClick={() => toggleFaq(index)}
               >
-                <button className={`faq-title${faqOpen[index] ? ' active' : ''}`} type="button">
+                <button
+                  className={`faq-title${faqOpen[index] ? ' active' : ''}`}
+                  type="button"
+                  onClick={() => toggleFaq(index)}
+                  aria-expanded={!!faqOpen[index]}
+                  aria-controls={`faq-content-${index}`}
+                >
                   <span>{item.q}</span>
-                  <span className="faq-icon">{faqOpen[index] ? '\u2212' : '+'}</span>
+                  <span className="faq-icon" aria-hidden="true">{faqOpen[index] ? '\u2212' : '+'}</span>
                 </button>
-                <div className="faq-content">
+                <div className="faq-content" id={`faq-content-${index}`} role="region">
                   <p>{item.a}</p>
                 </div>
               </div>
@@ -285,10 +297,12 @@ export default function HomePage() {
           <div className="services-grid">
             {/* Fitness */}
             <div className="service-card" data-aos="fade-up" data-aos-delay="100">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop"
                 alt="Fitness"
                 className="card-bg-img"
+                fill
+                sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 25vw"
               />
               <div className="card-overlay"></div>
               <div className="card-content">
@@ -304,10 +318,12 @@ export default function HomePage() {
 
             {/* Kick Boks */}
             <div className="service-card" data-aos="fade-up" data-aos-delay="200">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=2069&auto=format&fit=crop"
                 alt="Kick Boks"
                 className="card-bg-img"
+                fill
+                sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 25vw"
               />
               <div className="card-overlay"></div>
               <div className="card-content">
@@ -325,10 +341,12 @@ export default function HomePage() {
 
             {/* Pilates & Yoga */}
             <div className="service-card" data-aos="fade-up" data-aos-delay="300">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2120&auto=format&fit=crop"
                 alt="Yoga Pilates"
                 className="card-bg-img"
+                fill
+                sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 25vw"
               />
               <div className="card-overlay"></div>
               <div className="card-content">
@@ -344,10 +362,12 @@ export default function HomePage() {
 
             {/* Personal Training */}
             <div className="service-card" data-aos="fade-up" data-aos-delay="400">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop"
                 alt="Personal Training"
                 className="card-bg-img"
+                fill
+                sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 25vw"
               />
               <div className="card-overlay"></div>
               <div className="card-content">

@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { getSiteSetting } from '@/lib/db';
 
 export default function Footer() {
@@ -33,7 +34,7 @@ export default function Footer() {
       <div className="container footer-grid">
         {/* Logo & Description */}
         <div className="footer-col">
-          <img src="/images/DEBUTFiT.png" alt="DebutFit Club Logo" className="footer-logo" />
+          <Image src="/images/DEBUTFiT.png" alt="DebutFit Club Logo" className="footer-logo" width={150} height={55} />
           <p className="footer-desc">
             Sıradanlığı Bırak, Zirveye Ulaş. Hedeflerine en hızlı şekilde ulaşman için tasarlanmış premium yaşam tarzı merkezi.
           </p>

@@ -100,7 +100,7 @@ export default function AdminLayout({ children }) {
 
         @media (max-width: 768px) {
           .admin-sidebar {
-            position: fixed; left: -300px; top: 0; height: 100vh; z-index: 2000;
+            position: fixed; left: -100%; top: 0; width: 100%; height: 100vh; z-index: 2000;
             transition: left 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.5);
           }
           .admin-sidebar.open { left: 0; }
