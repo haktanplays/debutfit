@@ -384,7 +384,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 .pg-card {
     background-color: transparent;
     border-radius: 8px;
-    height: 250px; /* Kartın sabit yüksekliği */
+    height: 300px; /* Kartın sabit yüksekliği */
     perspective: 1000px; /* 3D Derinlik hissi */
     cursor: pointer;
 }
@@ -422,7 +422,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 }
 
 .pg-img {
-    height: 180px;
+    height: 200px;
     width: 100%;
     overflow: hidden;
 }
@@ -439,7 +439,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 }
 
 .pg-info {
-    height: 70px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -464,6 +464,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     justify-content: center;
     align-items: center;
     padding: 25px;
+    overflow-y: auto;
 }
 
 .pg-card-back h3 {
@@ -731,6 +732,11 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     overflow: hidden;
     transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
     background: rgba(0, 0, 0, 0.2);
+}
+
+.faq-item.open .faq-content {
+    max-height: 500px;
+    transition: max-height 0.4s ease;
 }
 
 .faq-content p {

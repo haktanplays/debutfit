@@ -28,7 +28,7 @@ export default function AdminLayout({ children }) {
         .admin-menu-item { padding: 15px 25px; color: #aaa; text-decoration: none; display: flex; align-items: center; gap: 15px; font-weight: 600; transition: all 0.3s; border-left: 4px solid transparent; cursor: pointer; font-size: 14px; }
         .admin-menu-item:hover, .admin-menu-item.active { background-color: rgba(255, 140, 0, 0.1); color: #FF8C00; border-left-color: #FF8C00; }
         .admin-menu-item svg { width: 20px; height: 20px; min-width: 20px; }
-        .admin-logout-btn { margin-top: auto; padding: 20px; text-align: center; border-top: 1px solid #333; }
+        .admin-logout-btn { padding: 20px; text-align: center; border-top: 1px solid #333; flex-shrink: 0; min-height: 60px; }
         .admin-logout-btn a { color: #ff4444; text-decoration: none; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
         .admin-logout-btn a:hover { color: #ff0000; transform: translateX(5px); }
 
@@ -40,7 +40,7 @@ export default function AdminLayout({ children }) {
         .admin-page-content { padding: 40px; animation: adminFadeIn 0.4s ease; overflow-wrap: break-word; word-break: break-word; }
         @keyframes adminFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; }
+        .admin-page-content .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; text-align: left; }
         .section-header h2 { font-size: 28px; color: #fff; overflow-wrap: break-word; word-break: break-word; }
         .add-btn { background: #FF8C00; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; font-size: 14px; }
         .add-btn:hover { background: #e67e00; }

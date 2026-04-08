@@ -67,7 +67,8 @@ export default function TrialManager() {
           style={{ padding: '10px 15px', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff', width: '300px', fontFamily: 'inherit' }}
         />
       </div>
-      <table className="data-table">
+      <div style={{ overflowX: 'auto' }}>
+      <table className="data-table" style={{ minWidth: '900px' }}>
         <thead>
           <tr>
             <th style={{ width: '15%' }}>Talep Tarihi</th>
@@ -105,6 +106,7 @@ export default function TrialManager() {
           ))}
         </tbody>
       </table>
+      </div>
 
       {statusModal && (
         <div className="admin-modal">

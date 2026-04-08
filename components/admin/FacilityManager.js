@@ -1,6 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getFacilities, upsertFacility, deleteFacility, uploadMediaBlob, deleteMedia, getPublicUrl } from '@/lib/db';
+import Cropper from 'cropperjs';
+import 'cropperjs/dist/cropper.css';
 
 const adminCardStyle = { background: '#1e1e1e', borderRadius: '12px', padding: '30px', border: '1px solid #333', marginBottom: '30px' };
 const adminInputStyle = { width: '100%', padding: '12px', background: '#2a2a2a', border: '1px solid #444', borderRadius: '8px', color: '#fff', fontSize: '14px' };
@@ -14,25 +16,6 @@ const overlayStyle = {
 };
 const modalStyle = { background: '#1e1e1e', borderRadius: '12px', padding: '30px', border: '1px solid #333', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' };
 
-function resizeToBlob(file, maxW, quality) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let w = img.width, h = img.height;
-        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        canvas.toBlob(resolve, 'image/jpeg', quality);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
 export default function FacilityManager() {
   const [items, setItems] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -41,7 +24,9 @@ export default function FacilityManager() {
   const [desc, setDesc] = useState('');
   const [existingImg, setExistingImg] = useState('');
   const [preview, setPreview] = useState('');
-  const [pendingFile, setPendingFile] = useState(null);
+  const cropperRef = useRef(null);
+  const imgRef = useRef(null);
+  const [showCropper, setShowCropper] = useState(false);
 
   const load = async () => {
     const data = await getFacilities();
@@ -50,6 +35,14 @@ export default function FacilityManager() {
   useEffect(() => { load(); }, []);
 
   const openModal = (id = null) => {
+    setEditId(null);
+    setTitle('');
+    setDesc('');
+    setExistingImg('');
+    setPreview('');
+    setShowCropper(false);
+    if (cropperRef.current) { cropperRef.current.destroy(); cropperRef.current = null; }
+
     if (id) {
       const item = items.find(x => x.id === id);
       if (item) {
@@ -59,37 +52,50 @@ export default function FacilityManager() {
         setExistingImg(item.image_path);
         setPreview(item.image_path ? getPublicUrl(item.image_path) : '');
       }
-    } else {
-      setEditId(null);
-      setTitle('');
-      setDesc('');
-      setExistingImg('');
-      setPreview('');
     }
-    setPendingFile(null);
     setModalOpen(true);
   };
 
-  const handleFileChange = async (e) => {
+  const closeModal = () => {
+    setModalOpen(false);
+    if (cropperRef.current) { cropperRef.current.destroy(); cropperRef.current = null; }
+    setShowCropper(false);
+  };
+
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => setPreview(ev.target.result);
+    reader.onload = (ev) => {
+      if (cropperRef.current) cropperRef.current.destroy();
+      setPreview('');
+      if (imgRef.current) {
+        imgRef.current.src = ev.target.result;
+        setShowCropper(true);
+        setTimeout(() => {
+          cropperRef.current = new Cropper(imgRef.current, {
+            aspectRatio: 560 / 320,
+            viewMode: 1,
+            autoCropArea: 1,
+          });
+        }, 100);
+      }
+    };
     reader.readAsDataURL(file);
-    setPendingFile(file);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
     let imagePath = existingImg;
-    if (pendingFile) {
-      const blob = await resizeToBlob(pendingFile, 560, 0.7);
+    if (cropperRef.current) {
+      const canvas = cropperRef.current.getCroppedCanvas({ width: 560, fillColor: '#fff' });
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.7));
       imagePath = await uploadMediaBlob('facilities', blob, 'jpg');
     }
 
     try {
       await upsertFacility({ id: editId, title, description: desc, image_path: imagePath });
-      setModalOpen(false);
+      closeModal();
       await load();
     } catch {
       alert('Hata: Resim boyutu cok yuksek.');
@@ -149,7 +155,7 @@ export default function FacilityManager() {
 
       {/* Modal */}
       {modalOpen && (
-        <div style={overlayStyle} onClick={() => setModalOpen(false)}>
+        <div style={overlayStyle} onClick={closeModal}>
           <div style={modalStyle} onClick={e => e.stopPropagation()}>
             <h3 style={{ color: '#FF8C00', fontSize: '18px', marginBottom: '20px' }}>
               {editId ? 'Tesis Imkani Duzenle' : 'Yeni Imkan Ekle'}
@@ -176,14 +182,22 @@ export default function FacilityManager() {
                 <input type="file" accept="image/*" onChange={handleFileChange} required={!editId} style={{ color: '#ccc', fontSize: '13px' }} />
                 {editId && <small style={{ color: '#FF8C00', display: 'block', marginTop: '5px' }}>Yeni gorsel secerseniz eskisi degisir.</small>}
               </div>
-              {preview && (
+              {showCropper && (
                 <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>Onizleme</label>
+                  <label style={{ display: 'block', color: '#FF8C00', fontSize: '13px', marginBottom: '6px' }}>Gorseli Kirpin</label>
+                  <div style={{ maxHeight: '300px', backgroundColor: '#222', border: '1px solid #444', borderRadius: '5px', overflow: 'hidden' }}>
+                    <img ref={imgRef} src="" style={{ maxWidth: '100%', display: 'block' }} alt="crop" />
+                  </div>
+                </div>
+              )}
+              {!showCropper && preview && (
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>Mevcut Gorsel</label>
                   <img src={preview} alt="preview" style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #444' }} />
                 </div>
               )}
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setModalOpen(false)} style={{ ...adminBtnStyle, background: '#333' }}>Iptal</button>
+                <button type="button" onClick={closeModal} style={{ ...adminBtnStyle, background: '#333' }}>Iptal</button>
                 <button type="submit" style={adminBtnStyle}>{editId ? 'Guncelle' : 'Ekle'}</button>
               </div>
             </form>

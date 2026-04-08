@@ -171,12 +171,11 @@ export default function HomePage() {
           >
             {slides.length > 0 && (
               <>
-                <div className="hero-slider-track">
+                <div className="hero-slider-wrapper">
                   {slides.map((slide, i) => (
                     <div
                       key={i}
                       className={`hero-slide${i === currentSlide ? ' active' : ''}`}
-                      style={{ display: i === currentSlide ? 'block' : 'none' }}
                     >
                       {slide.type === 'video' ? (
                         <video
@@ -230,7 +229,7 @@ export default function HomePage() {
                     {slides.map((_, i) => (
                       <span
                         key={i}
-                        className={`slider-dot${i === currentSlide ? ' active' : ''}`}
+                        className={`dot${i === currentSlide ? ' active' : ''}`}
                         onClick={() => setCurrentSlide(i)}
                       />
                     ))}
@@ -261,18 +260,11 @@ export default function HomePage() {
                 className={`faq-item${faqOpen[index] ? ' open' : ''}`}
                 onClick={() => toggleFaq(index)}
               >
-                <div className="faq-question">
+                <button className={`faq-title${faqOpen[index] ? ' active' : ''}`} type="button">
                   <span>{item.q}</span>
-                  <span className="faq-toggle">{faqOpen[index] ? '\u2212' : '+'}</span>
-                </div>
-                <div
-                  className="faq-answer"
-                  style={{
-                    maxHeight: faqOpen[index] ? '500px' : '0',
-                    overflow: 'hidden',
-                    transition: 'max-height 0.4s ease',
-                  }}
-                >
+                  <span className="faq-icon">{faqOpen[index] ? '\u2212' : '+'}</span>
+                </button>
+                <div className="faq-content">
                   <p>{item.a}</p>
                 </div>
               </div>

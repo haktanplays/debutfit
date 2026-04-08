@@ -57,9 +57,8 @@ export default function Footer() {
         <div className="footer-col">
           <h4 className="footer-title">Çalışma <span className="highlight">Saatleri</span></h4>
           <ul className="footer-hours">
-            <li><span>Hafta İçi:</span> 07:00 - 23:00</li>
-            <li><span>Cumartesi:</span> 09:00 - 22:00</li>
-            <li><span>Pazar:</span> 10:00 - 20:00</li>
+            <li><span>Hafta İçi:</span> 09:00 - 23:00</li>
+            <li><span>Hafta Sonu:</span> 09:00 - 22:00</li>
           </ul>
         </div>
 
