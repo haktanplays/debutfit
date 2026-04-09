@@ -120,6 +120,17 @@ export default function HomePage() {
   const activeSlide = slides[currentSlide];
   const isVideoMode = activeSlide && activeSlide.type === 'video';
 
+  // AOS ve React çakışmasını önleyen sınıf yönetimi
+  useEffect(() => {
+    if (sliderContainerRef.current) {
+      if (isVideoMode) {
+        sliderContainerRef.current.classList.add('video-mode');
+      } else {
+        sliderContainerRef.current.classList.remove('video-mode');
+      }
+    }
+  }, [isVideoMode]);
+
   // --- FAQ toggle ---
   function toggleFaq(index) {
     setFaqOpen((prev) => ({ ...prev, [index]: !prev[index] }));
@@ -177,85 +188,86 @@ export default function HomePage() {
           </div>
 
           {/* Hero Slider */}
-          <div data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-            <div
-              ref={sliderContainerRef}
-              className={`hero-stats${isVideoMode ? ' video-mode' : ''}`}
-              id="heroSliderContainer"
-            >
-              {slides.length > 0 && (
-                <>
-                  <div className="hero-slider-wrapper">
-                    {slides.map((slide, i) => (
-                      <div
+          <div
+            ref={sliderContainerRef}
+            className="hero-stats"
+            id="heroSliderContainer"
+            data-aos="fade-left"
+            data-aos-duration="1000"
+            data-aos-delay="200"
+          >
+            {slides.length > 0 && (
+              <>
+                <div className="hero-slider-wrapper">
+                  {slides.map((slide, i) => (
+                    <div
+                      key={i}
+                      className={`hero-slide${i === currentSlide ? ' active' : ''}`}
+                    >
+                      {slide.type === 'video' ? (
+                        <video
+                          ref={(el) => { videoRefs.current[i] = el; }}
+                          src={slide.src}
+                          muted
+                          playsInline
+                          preload="none"
+                          style={{ width: '100%', display: 'block', borderRadius: 'inherit' }}
+                        />
+                      ) : (
+                        <img
+                          src={slide.src}
+                          alt={slide.title || 'DebutFit'}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 'inherit' }}
+                        />
+                      )}
+                      {slide.title && (
+                        <div className="hero-slide-caption glass-panel">
+                          <span>{slide.title}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Nav arrows */}
+                {slides.length > 1 && (
+                  <>
+                    <button
+                      className="slider-arrow slider-prev"
+                      aria-label="Önceki slayt"
+                      onClick={() => {
+                        setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+                      }}
+                    >
+                      &#10094;
+                    </button>
+                    <button
+                      className="slider-arrow slider-next"
+                      aria-label="Sonraki slayt"
+                      onClick={() => {
+                        setCurrentSlide((prev) => (prev + 1) % slides.length);
+                      }}
+                    >
+                      &#10095;
+                    </button>
+                  </>
+                )}
+
+                {/* Dot indicators */}
+                {slides.length > 1 && (
+                  <div className="slider-dots">
+                    {slides.map((_, i) => (
+                      <button
                         key={i}
-                        className={`hero-slide${i === currentSlide ? ' active' : ''}`}
-                      >
-                        {slide.type === 'video' ? (
-                          <video
-                            ref={(el) => { videoRefs.current[i] = el; }}
-                            src={slide.src}
-                            muted
-                            playsInline
-                            preload="none"
-                            style={{ width: '100%', display: 'block', borderRadius: 'inherit' }}
-                          />
-                        ) : (
-                          <img
-                            src={slide.src}
-                            alt={slide.title || 'DebutFit'}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 'inherit' }}
-                          />
-                        )}
-                        {slide.title && (
-                          <div className="hero-slide-caption glass-panel">
-                            <span>{slide.title}</span>
-                          </div>
-                        )}
-                      </div>
+                        className={`dot${i === currentSlide ? ' active' : ''}`}
+                        aria-label={`Slayt ${i + 1}`}
+                        onClick={() => setCurrentSlide(i)}
+                      />
                     ))}
                   </div>
-
-                  {/* Nav arrows */}
-                  {slides.length > 1 && (
-                    <>
-                      <button
-                        className="slider-arrow slider-prev"
-                        aria-label="Önceki slayt"
-                        onClick={() => {
-                          setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-                        }}
-                      >
-                        &#10094;
-                      </button>
-                      <button
-                        className="slider-arrow slider-next"
-                        aria-label="Sonraki slayt"
-                        onClick={() => {
-                          setCurrentSlide((prev) => (prev + 1) % slides.length);
-                        }}
-                      >
-                        &#10095;
-                      </button>
-                    </>
-                  )}
-
-                  {/* Dot indicators */}
-                  {slides.length > 1 && (
-                    <div className="slider-dots">
-                      {slides.map((_, i) => (
-                        <button
-                          key={i}
-                          className={`dot${i === currentSlide ? ' active' : ''}`}
-                          aria-label={`Slayt ${i + 1}`}
-                          onClick={() => setCurrentSlide(i)}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </section>
