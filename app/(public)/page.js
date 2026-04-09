@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useModal } from '@/components/ModalProvider';
 import { getSliderItems, getSiteSetting, getFaqItems, getPublicUrl } from '@/lib/db';
 
