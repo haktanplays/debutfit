@@ -16,7 +16,13 @@ export default function Footer() {
     load();
   }, []);
 
-  if (!contact) return null;
+  if (!contact) return (
+    <footer className="site-footer">
+      <div className="footer-bottom">
+        <p>&copy; 2026 DebutFit Club. Tüm hakları saklıdır.</p>
+      </div>
+    </footer>
+  );
 
   const phones = Array.isArray(contact.phones)
     ? contact.phones

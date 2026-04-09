@@ -610,8 +610,9 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     height: 100%;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.8s ease-in-out;
-    transform: scale(1.05); 
+    transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out, transform 0.8s ease-in-out;
+    transform: scale(1.05);
+    z-index: 1;
 }
 
 .hero-slide.active {
@@ -666,6 +667,8 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     width: 10px;
     height: 10px;
     background: rgba(255,255,255,0.3);
+    border: none;
+    padding: 0;
     border-radius: 50%;
     transition: all 0.3s ease;
 }
@@ -711,8 +714,15 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     cursor: pointer;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 15px;
     transition: all 0.3s ease;
+}
+
+.faq-title > span:first-child {
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .faq-title.active {
@@ -724,6 +734,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     font-weight: 300;
     transition: transform 0.4s ease;
     color: #888;
+    flex-shrink: 0;
 }
 
 .faq-title.active .faq-icon {
@@ -739,7 +750,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 }
 
 .faq-item.open .faq-content {
-    max-height: 500px;
+    max-height: 1000px;
     transition: max-height 0.4s ease;
 }
 
@@ -749,6 +760,8 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     line-height: 1.7;
     font-size: 15px;
     margin: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 /* --- GALERİ VE ALBÜM STİLLERİ --- */
@@ -922,6 +935,9 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     gap: 6px;
     cursor: pointer;
     z-index: 101;
+    background: none;
+    border: none;
+    padding: 8px;
 }
 
 .mobile-menu-btn span {
@@ -930,10 +946,14 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     background-color: var(--accent-orange);
     border-radius: 3px;
     transition: 0.3s;
+    display: block;
 }
 
 .close-menu-btn {
     display: none;
+    background: none;
+    border: none;
+    padding: 0;
 }
 
 /* --- MOBİL GÖRÜNÜM (992px ve altı) --- */
@@ -973,18 +993,28 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 
     /* Çarpı (Kapatma) Butonu */
     .close-menu-btn {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: absolute;
         top: 15px;
         right: 25px;
-        font-size: 45px;
+        width: 44px;
+        height: 44px;
+        font-size: 32px;
         color: #fff;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
         cursor: pointer;
         line-height: 1;
-        transition: color 0.3s;
+        padding: 0;
+        transition: all 0.3s;
     }
     .close-menu-btn:hover {
         color: var(--accent-orange);
+        border-color: var(--accent-orange);
+        background: rgba(0, 0, 0, 0.5);
     }
 
     /* 3. Ana Sayfa Slider Mobil Uyumu */
@@ -1123,34 +1153,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
 }
 
-/* --- Ana Sayfa Görsel Slider Stilleri --- */
-#heroSliderContainer {
-    position: relative;
-    width: 100%;
-    max-width: 420px;
-    height: 520px; /* GÖRSELLER İÇİN SABİT YÜKSEKLİK */
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 15px;
-}
-
-.hero-slider-wrapper {
-    position: relative;
-    width: 100%;
-    height: 460px; /* GÖRSELLER İÇİN SABİT YÜKSEKLİK */
-    flex-shrink: 0;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.2);
-    background: #1a1a1a;
-}
-
-/* ... .hero-slide ve diğer mevcut kodların aynı kalsın ... */
-
-/* --- EKLENECEK YENİ KISIM: VİDEO MODU --- */
+/* --- VİDEO MODU --- */
 /* Sadece video geldiğinde yüksekliği otomatik esnetir */
 #heroSliderContainer.video-mode {
     height: auto;

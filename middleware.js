@@ -1,15 +1,31 @@
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
-export function middleware(request) {
-  const hasAuthCookie = request.cookies.getAll().some(c =>
-    c.name.startsWith('sb-') && c.name.endsWith('-auth-token')
+export async function middleware(request) {
+  const response = NextResponse.next()
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
   )
 
-  if (request.nextUrl.pathname.startsWith('/admin') && !hasAuthCookie) {
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (request.nextUrl.pathname.startsWith('/admin') && !user) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
-  return NextResponse.next()
+  return response
 }
 
 export const config = {

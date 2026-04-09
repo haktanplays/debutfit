@@ -17,7 +17,12 @@ export default function TesisPage() {
     load();
   }, []);
 
-  if (!loaded) return null;
+  if (!loaded) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: '40px', height: '40px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#FF8C00', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
 
   return (
     <section className="amenities-section" style={{ minHeight: '100vh', paddingTop: '150px' }}>

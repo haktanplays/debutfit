@@ -26,8 +26,10 @@ export default function GalleryManager() {
   const [processing, setProcessing] = useState(false);
 
   const load = async () => {
-    const data = await getAlbums();
-    setAlbums(data);
+    try {
+      const data = await getAlbums();
+      setAlbums(data);
+    } catch (err) { console.error('Failed to load albums:', err); }
   };
   useEffect(() => { load(); }, []);
 

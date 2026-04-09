@@ -16,8 +16,10 @@ export default function ProgramManager() {
   const [showCropper, setShowCropper] = useState(false);
 
   const loadPrograms = async () => {
-    const data = await getPrograms();
-    setPrograms(data);
+    try {
+      const data = await getPrograms();
+      setPrograms(data);
+    } catch (err) { console.error('Failed to load programs:', err); }
   };
 
   useEffect(() => { loadPrograms(); }, []);
@@ -76,6 +78,7 @@ export default function ProgramManager() {
       const canvas = cropperRef.current.getCroppedCanvas({ width: 560, fillColor: '#fff' });
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.7));
       imagePath = await uploadMediaBlob('programs', blob, 'jpg');
+      if (existingImg && existingImg !== imagePath) await deleteMedia(existingImg);
     }
 
     try {
@@ -104,7 +107,8 @@ export default function ProgramManager() {
           Yeni Ekle
         </button>
       </div>
-      <table className="data-table">
+      <div style={{ overflowX: 'auto' }}>
+      <table className="data-table" style={{ minWidth: '600px' }}>
         <thead>
           <tr>
             <th style={{ width: '10%' }}>Gorsel</th>
@@ -127,6 +131,7 @@ export default function ProgramManager() {
           ))}
         </tbody>
       </table>
+      </div>
 
       {modalOpen && (
         <div className="admin-modal">

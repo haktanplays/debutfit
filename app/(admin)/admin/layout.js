@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { AdminProvider, useAdmin } from '@/components/admin/AdminContext';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> },
@@ -13,8 +13,9 @@ const menuItems = [
   { id: 'galeri-admin', label: 'Galeri Yonetimi', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> },
 ];
 
-export default function AdminLayout({ children }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+function AdminLayoutInner({ children }) {
+  const { activeTab, setActiveTab, sidebarOpen, setSidebarOpen } = useAdmin();
+  const currentLabel = menuItems.find(m => m.id === activeTab)?.label || 'Yonetici Paneli';
 
   return (
     <>
@@ -100,10 +101,12 @@ export default function AdminLayout({ children }) {
 
         @media (max-width: 768px) {
           .admin-sidebar {
-            position: fixed; left: -100%; top: 0; width: 100%; height: 100vh; z-index: 2000;
+            position: fixed; left: -300px; top: 0; width: 280px; max-width: 85vw; height: 100vh; z-index: 2000;
             transition: left 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.5);
           }
           .admin-sidebar.open { left: 0; }
+          .admin-sidebar .admin-menu { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+          .admin-sidebar .admin-logout-btn { position: sticky; bottom: 0; background: #121212; border-top: 1px solid #333; padding: 15px 20px; flex-shrink: 0; }
           .mobile-menu-toggle { display: block; }
           .close-admin-menu { display: block !important; }
           .stats-grid { grid-template-columns: 1fr; }
@@ -113,12 +116,23 @@ export default function AdminLayout({ children }) {
           .admin-page-content { padding: 20px; }
           .section-header { flex-direction: column; align-items: flex-start; gap: 15px; }
           .section-header h2 { font-size: 22px; }
-          .data-table { display: block; width: 100%; overflow-x: auto; }
           .data-table td { white-space: normal; max-width: 200px; }
           .admin-modal-content { width: 95%; padding: 20px; margin: 20px auto; }
+          .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+          .action-btns button { margin-right: 0; padding: 8px 14px; font-size: 12px; }
+          .edit-btn, .delete-btn { padding: 8px 14px; font-size: 12px; }
         }
       `}</style>
       <div className="admin-root">
+        {sidebarOpen && (
+          <div
+            style={{
+              position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+              background: 'rgba(0,0,0,0.6)', zIndex: 1999, backdropFilter: 'blur(2px)'
+            }}
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
         <aside className={`admin-sidebar${sidebarOpen ? ' open' : ''}`}>
           <div className="admin-sidebar-logo">
             <h2 style={{ color: '#fff', letterSpacing: '2px', fontSize: '18px' }}>
@@ -130,7 +144,11 @@ export default function AdminLayout({ children }) {
           </div>
           <div className="admin-menu">
             {menuItems.map(item => (
-              <div key={item.id} className="admin-menu-item" data-tab={item.id}>
+              <div
+                key={item.id}
+                className={`admin-menu-item${activeTab === item.id ? ' active' : ''}`}
+                onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
+              >
                 {item.icon}
                 {item.label}
               </div>
@@ -156,7 +174,7 @@ export default function AdminLayout({ children }) {
               <button className="mobile-menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
               </button>
-              <h1>Yonetici Paneli</h1>
+              <h1>{currentLabel}</h1>
             </div>
             <div className="admin-profile"><span>Hos Geldin, Yonetici</span></div>
           </header>
@@ -166,5 +184,13 @@ export default function AdminLayout({ children }) {
         </main>
       </div>
     </>
+  );
+}
+
+export default function AdminLayout({ children }) {
+  return (
+    <AdminProvider>
+      <AdminLayoutInner>{children}</AdminLayoutInner>
+    </AdminProvider>
   );
 }

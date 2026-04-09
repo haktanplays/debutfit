@@ -66,7 +66,7 @@ export default function LoginModal() {
         <h2 id="login-modal-title" className="gradient-text-modal">Yönetici Girişi</h2>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <input type="email" ref={emailRef} value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="off" />
+            <input type="email" ref={emailRef} value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
             <label>E-posta</label>
             <span className="bar"></span>
           </div>

@@ -23,10 +23,12 @@ export default function SliderManager() {
   const [error, setError] = useState('');
 
   const load = async () => {
-    const data = await getSliderItems();
-    setItems(data);
-    const heroBgData = await getSiteSetting('hero_bg');
-    setHeroBg(heroBgData?.image_path || '');
+    try {
+      const data = await getSliderItems();
+      setItems(data);
+      const heroBgData = await getSiteSetting('hero_bg');
+      setHeroBg(heroBgData?.image_path || '');
+    } catch (err) { console.error('Failed to load slider items:', err); }
   };
 
   useEffect(() => { load(); }, []);
