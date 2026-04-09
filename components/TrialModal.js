@@ -50,14 +50,15 @@ export default function TrialModal() {
   };
 
   const handlePhoneChange = (e) => {
-    setPhone(e.target.value.replace(/[^0-9+]/g, ''));
+    const val = e.target.value.replace(/[^0-9]/g, '');
+    if (val.length <= 10) setPhone(val);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await insertTrial({ name, gender, phone, trial_date: date });
+      await insertTrial({ name, gender, phone: '+90 ' + phone, trial_date: date });
       setShowSuccess(true);
       setTimeout(() => handleClose(), 4000);
     } catch (err) { console.error(err); alert('Bir hata oluştu.'); } finally { setSubmitting(false); }

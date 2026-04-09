@@ -16,7 +16,6 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const heroSlideTimeout = useRef(null);
   const videoRefs = useRef({});
-  const sliderContainerRef = useRef(null);
 
   // --- About ---
   const [aboutTitle, setAboutTitle] = useState('DEBUTFIT CLUB ATAKENT');
@@ -36,11 +35,37 @@ export default function HomePage() {
         setHeroBg(heroBgData.image_path ? getPublicUrl(heroBgData.image_path) : '');
 
         const sliderData = await getSliderItems();
-        setSlides(sliderData.map(item => ({
+        const mappedSlides = sliderData.map(item => ({
           type: item.media_type,
           src: getPublicUrl(item.file_path),
-          title: ''
-        })));
+          title: '',
+          videoWidth: 0,
+          videoHeight: 0
+        }));
+
+        // Video metadata'larını slider render'dan ÖNCE preload et
+        await Promise.all(mappedSlides.map((slide) => {
+          if (slide.type === 'video') {
+            return new Promise((resolve) => {
+              const vid = document.createElement('video');
+              vid.preload = 'metadata';
+              vid.src = slide.src;
+              const cleanup = () => { vid.onloadedmetadata = null; vid.onerror = null; vid.src = ''; };
+              const timer = setTimeout(() => { cleanup(); resolve(); }, 8000);
+              vid.onloadedmetadata = () => {
+                slide.videoWidth = vid.videoWidth;
+                slide.videoHeight = vid.videoHeight;
+                clearTimeout(timer);
+                cleanup();
+                resolve();
+              };
+              vid.onerror = () => { clearTimeout(timer); cleanup(); resolve(); };
+            });
+          }
+          return Promise.resolve();
+        }));
+
+        setSlides(mappedSlides);
 
         const about = await getSiteSetting('about');
         if (about.title) setAboutTitle(about.title);
@@ -56,10 +81,8 @@ export default function HomePage() {
 
   // --- Slider auto-advance logic ---
   const advanceSlide = useCallback(() => {
-    setCurrentSlide((prev) => {
-      const next = (prev + 1) % slides.length;
-      return next;
-    });
+    if (slides.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
   }, [slides.length]);
 
   const startSlideTimer = useCallback((index) => {
@@ -115,21 +138,6 @@ export default function HomePage() {
       });
     };
   }, [currentSlide, slides, loaded, startSlideTimer]);
-
-  // Video mode class
-  const activeSlide = slides[currentSlide];
-  const isVideoMode = activeSlide && activeSlide.type === 'video';
-
-  // AOS ve React çakışmasını önleyen sınıf yönetimi
-  useEffect(() => {
-    if (sliderContainerRef.current) {
-      if (isVideoMode) {
-        sliderContainerRef.current.classList.add('video-mode');
-      } else {
-        sliderContainerRef.current.classList.remove('video-mode');
-      }
-    }
-  }, [isVideoMode]);
 
   // --- FAQ toggle ---
   function toggleFaq(index) {
@@ -189,7 +197,6 @@ export default function HomePage() {
 
           {/* Hero Slider */}
           <div
-            ref={sliderContainerRef}
             className="hero-stats"
             id="heroSliderContainer"
             data-aos="fade-left"
@@ -211,13 +218,11 @@ export default function HomePage() {
                           muted
                           playsInline
                           preload="metadata"
-                          style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 'inherit' }}
                         />
                       ) : (
                         <img
                           src={slide.src}
                           alt={slide.title || 'DebutFit'}
-                          style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 'inherit' }}
                         />
                       )}
                       {slide.title && (
@@ -280,8 +285,6 @@ export default function HomePage() {
             <p id="dynamicAboutDesc">{aboutDesc}</p>
             <div className="header-line"></div>
           </div>
-
-          <div className="gallery-grid"></div>
 
           {/* FAQ Accordion */}
           <div className="faq-container" data-aos="fade-up" data-aos-delay="200">

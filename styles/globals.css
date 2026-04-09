@@ -102,7 +102,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     border: 1px solid rgba(255, 140, 0, 0.3);
 }
 
-.modern-title { font-size: 64px; color: #fff; font-weight: 900; line-height: 1.1; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; }
+.modern-title { font-size: 64px; color: #fff; font-weight: 900; line-height: 1.1; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; overflow-wrap: break-word; }
 .highlight-text { color: var(--accent-orange); }
 .hero-text p { font-size: 20px; color: #d1d1d1; line-height: 1.6; margin-bottom: 40px; font-weight: 300; }
 .hero-buttons { display: flex; gap: 20px; align-items: center; }
@@ -167,6 +167,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 /* --- Hizmetlerimiz (Özet) Bölümü - GÖRSELLİ VERSİYON --- */
 .services-summary-section { padding: 80px 50px 100px 50px; background-color: #0f0f0f; }
 .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; margin-bottom: 50px; }
+.programs-page-section .services-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 300px)); justify-content: center; }
 .service-card { position: relative; height: 350px; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.4s ease; cursor: pointer; }
 .card-bg-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; transition: transform 0.6s ease; }
 .card-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 1; transition: background 0.4s ease; }
@@ -387,10 +388,11 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 /* 3D Dönüşüm İçin Ana Sahne Ayarları */
 .pg-card {
     background-color: transparent;
-    border-radius: 8px;
-    height: 300px; /* Kartın sabit yüksekliği */
-    perspective: 1000px; /* 3D Derinlik hissi */
+    border-radius: 15px;
+    height: 350px;
+    perspective: 1000px;
     cursor: pointer;
+    transform-style: preserve-3d;
 }
 
 /* Ön ve Arkayı Tutan İç Kutu */
@@ -413,48 +415,34 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     position: absolute;
     width: 100%;
     height: 100%;
-    -webkit-backface-visibility: hidden; /* Arkası dönükken görünmesini engelle */
+    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    border-radius: 8px;
+    border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* --- KARTIN ÖN YÜZÜ --- */
+/* --- KARTIN ÖN YÜZÜ (service-card tarzı) --- */
 .pg-card-front {
-    background-color: #ffffff; 
+    background-color: #1a1a1a;
 }
 
-.pg-img {
-    height: 200px;
-    width: 100%;
-    overflow: hidden;
+.pg-card-front .card-bg-img {
+    transition: transform 0.6s ease;
 }
 
-.pg-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
+.pg-card:hover .pg-card-front .card-bg-img {
+    transform: scale(1.1);
 }
 
-.pg-card:hover .pg-img img {
-    transform: scale(1.05); /* Fareyle üstüne gelince görsel hafif büyür */
+.pg-card:hover .pg-card-front .card-overlay {
+    background: rgba(0, 0, 0, 0.6);
 }
 
-.pg-info {
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.pg-info h3 {
-    color: #121212; 
-    font-size: 20px;
-    font-weight: 800;
-    margin: 0;
-    text-transform: uppercase;
+.pg-card:hover {
+    border-color: var(--accent-orange);
+    box-shadow: 0 10px 30px rgba(255, 140, 0, 0.2);
 }
 
 /* --- KARTIN ARKA YÜZÜ (Açıklama Kısmı) --- */
@@ -590,39 +578,40 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     gap: 15px; /* Fotoğraflar ve noktalar arasındaki boşluk */
 }
 
-/* Ana kapsayıcı dinamik yükseklik alacak */
+/* Slider wrapper — sabit aspect-ratio, tüm medya sığar */
 .hero-slider-wrapper {
     position: relative;
     width: 100%;
+    aspect-ratio: 3 / 4;
     overflow: hidden;
-    display: block;
     border-radius: 20px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.5);
     border: 1px solid rgba(255,255,255,0.2);
     background: #1a1a1a;
 }
 
-/* Tüm slaytlar varsayılan olarak yer kaplamaz (absolute) ve gizlidir */
+/* Tüm slaytlar tam alanı kaplar */
 .hero-slide {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
+    height: 100%;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.5s ease-in-out;
 }
 
-/* SADECE aktif olan slayt yer kaplar (relative) ve wrapper'ı esnetir! */
 .hero-slide.active {
-    position: relative;
     opacity: 1;
     visibility: visible;
 }
 
-.hero-slide img {
+.hero-slide img,
+.hero-slide video {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
     display: block;
 }
 
@@ -661,18 +650,33 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 }
 
 .slider-dots .dot {
-    width: 10px;
-    height: 10px;
-    background: rgba(255,255,255,0.3);
+    width: 44px;
+    height: 44px;
+    background: transparent;
     border: none;
     padding: 0;
     border-radius: 50%;
     transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
 }
 
-.slider-dots .dot.active {
+.slider-dots .dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transition: all 0.3s ease;
+}
+
+.slider-dots .dot.active::after {
     background: var(--accent-orange);
-    transform: scale(1.3);
+    transform: translate(-50%, -50%) scale(1.3);
     box-shadow: 0 0 10px rgba(255,140,0,0.5);
 }
 
@@ -743,7 +747,6 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
-    background: rgba(0, 0, 0, 0.2);
 }
 
 .faq-item.open .faq-content {
@@ -752,13 +755,15 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 }
 
 .faq-content p {
-    padding: 0 30px 25px 30px;
+    padding: 20px 30px;
     color: #ccc;
     line-height: 1.7;
     font-size: 15px;
     margin: 0;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* --- GALERİ VE ALBÜM STİLLERİ --- */
@@ -967,7 +972,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
         left: -300px; /* Başlangıçta ekranın solunda gizli */
         width: 280px;
         height: 100vh;
-        background-color: #969696;
+        background-color: #1a1a1a;
         border-right: 1px solid rgba(255,140,0,0.2);
         box-shadow: 5px 0 20px rgba(0,0,0,0.8);
         transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -982,10 +987,14 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     }
 
     nav ul {
-        flex-direction: column; /* Linkleri alt alta diz */
+        flex-direction: column;
         align-items: flex-start;
         padding: 0 30px;
         gap: 25px;
+    }
+
+    nav#mainNav .nav-link {
+        color: #fff;
     }
 
     /* Çarpı (Kapatma) Butonu */
@@ -1023,11 +1032,12 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     }
 
     .hero-slider-wrapper {
-        /* Dinamik yükseklik - içerik belirler */
+        aspect-ratio: 3 / 4;
     }
-    
-    .hero-slide img {
-        object-position: top; /* Mobilde görsellerin üst kısmı odakta kalsın */
+
+    .hero-slide img,
+    .hero-slide video {
+        object-position: top; /* Mobilde içeriğin üst kısmı odakta kalsın */
     }
 }
 
@@ -1150,25 +1160,6 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
 }
 
-/* --- VİDEO MODU --- */
-/* Sadece video geldiğinde yüksekliği otomatik esnetir */
-#heroSliderContainer.video-mode {
-    height: auto;
-}
-
-#heroSliderContainer.video-mode .hero-slider-wrapper {
-    height: auto;
-}
-
-#heroSliderContainer.video-mode .hero-slide.active {
-    position: relative; 
-    height: auto;
-}
-
-#heroSliderContainer.video-mode .hero-slide video {
-    height: auto !important;
-    display: block;
-}
 
 
 

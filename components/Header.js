@@ -25,8 +25,15 @@ export default function Header() {
         setMenuOpen(false);
       }
     };
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && menuOpen) setMenuOpen(false);
+    };
     document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
   }, [menuOpen]);
 
   return (

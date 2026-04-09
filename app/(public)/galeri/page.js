@@ -35,6 +35,10 @@ export default function GaleriPage() {
     document.body.style.overflow = 'auto';
   }, []);
 
+  useEffect(() => {
+    return () => { document.body.style.overflow = 'auto'; };
+  }, []);
+
   const changePhoto = useCallback((direction) => {
     setCurrentIndex(prev => {
       let next = prev + direction;

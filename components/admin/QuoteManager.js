@@ -68,19 +68,19 @@ export default function QuoteManager() {
         />
       </div>
       <div style={{ overflowX: 'auto' }}>
-      <table className="data-table" style={{ minWidth: '1000px' }}>
+      <table className="data-table" style={{ minWidth: '1000px', tableLayout: 'fixed' }}>
         <thead>
           <tr>
-            <th style={{ width: '10%' }}>Talep Tarihi</th>
-            <th style={{ width: '13%' }}>Isim Soyisim</th>
-            <th style={{ width: '7%' }}>Yas/Cins.</th>
-            <th style={{ width: '11%' }}>Telefon</th>
-            <th style={{ width: '11%' }}>Istenen Paket</th>
-            <th style={{ width: '10%' }}>Kampanya</th>
-            <th style={{ width: '13%' }}>Ek Hizmetler</th>
-            <th style={{ width: '8%' }}>Ilgilenen</th>
-            <th style={{ width: '7%' }}>Durum</th>
-            <th style={{ width: '10%' }}>Islem</th>
+            <th>Talep Tarihi</th>
+            <th>Isim Soyisim</th>
+            <th>Yas/Cins.</th>
+            <th>Telefon</th>
+            <th>Istenen Paket</th>
+            <th>Kampanya</th>
+            <th>Ek Hizmetler</th>
+            <th>Ilgilenen</th>
+            <th>Durum</th>
+            <th>Islem</th>
           </tr>
         </thead>
         <tbody>

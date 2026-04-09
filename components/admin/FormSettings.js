@@ -8,8 +8,9 @@ function SettingSection({ title, placeholder, data, onAdd, onDelete, onReorder, 
   const tbodyRef = useRef(null);
 
   useEffect(() => {
+    let sortable;
     if (tbodyRef.current && data.length > 0) {
-      new Sortable(tbodyRef.current, {
+      sortable = new Sortable(tbodyRef.current, {
         handle: '.drag-handle',
         animation: 150,
         ghostClass: 'sortable-ghost',
@@ -22,6 +23,7 @@ function SettingSection({ title, placeholder, data, onAdd, onDelete, onReorder, 
         }
       });
     }
+    return () => { if (sortable) sortable.destroy(); };
   }, [data, type, onReorder]);
 
   const handleAdd = () => {

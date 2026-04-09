@@ -41,7 +41,7 @@ export default function LoginModal() {
         setErrorColor('#00C06B');
         setError('Giriş başarılı! Yönlendiriliyorsunuz...');
         setTimeout(() => {
-          window.location.href = '/admin';
+          router.push('/admin');
         }, 1500);
       }
     } catch (err) {

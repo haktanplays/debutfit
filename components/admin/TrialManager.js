@@ -68,17 +68,17 @@ export default function TrialManager() {
         />
       </div>
       <div style={{ overflowX: 'auto' }}>
-      <table className="data-table" style={{ minWidth: '900px' }}>
+      <table className="data-table" style={{ minWidth: '900px', tableLayout: 'fixed' }}>
         <thead>
           <tr>
-            <th style={{ width: '15%' }}>Talep Tarihi</th>
-            <th style={{ width: '15%' }}>Isim Soyisim</th>
-            <th style={{ width: '10%' }}>Cinsiyet</th>
-            <th style={{ width: '15%' }}>Telefon</th>
-            <th style={{ width: '15%' }}>Randevu Tarihi</th>
-            <th style={{ width: '10%' }}>Ilgilenen Kisi</th>
-            <th style={{ width: '10%' }}>Durum</th>
-            <th style={{ width: '10%' }}>Islem</th>
+            <th>Talep Tarihi</th>
+            <th>Isim Soyisim</th>
+            <th>Cinsiyet</th>
+            <th>Telefon</th>
+            <th>Randevu Tarihi</th>
+            <th>Ilgilenen Kisi</th>
+            <th>Durum</th>
+            <th>Islem</th>
           </tr>
         </thead>
         <tbody>

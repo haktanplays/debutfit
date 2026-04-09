@@ -65,7 +65,8 @@ export default function GalleryManager() {
     setProcessing(true);
 
     try {
-      const albumId = await upsertAlbum({ id: editId, title, description: desc, author, cover_path: existingPhotos[0]?.file_path || '' });
+      const coverPhoto = existingPhotos.find(p => p.file_path);
+      const albumId = await upsertAlbum({ id: editId, title, description: desc, author, cover_path: coverPhoto?.file_path || '' });
 
       const fileInput = e.target.querySelector('input[type="file"]');
       const files = fileInput?.files || [];

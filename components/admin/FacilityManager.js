@@ -29,8 +29,10 @@ export default function FacilityManager() {
   const [showCropper, setShowCropper] = useState(false);
 
   const load = async () => {
-    const data = await getFacilities();
-    setItems(data);
+    try {
+      const data = await getFacilities();
+      setItems(data);
+    } catch (err) { console.error(err); }
   };
   useEffect(() => { load(); }, []);
 
@@ -94,6 +96,7 @@ export default function FacilityManager() {
     }
 
     try {
+      if (existingImg && imagePath !== existingImg) await deleteMedia(existingImg);
       await upsertFacility({ id: editId, title, description: desc, image_path: imagePath });
       closeModal();
       await load();
