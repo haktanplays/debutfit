@@ -20,7 +20,7 @@ export default function HomePage() {
 
   // --- About ---
   const [aboutTitle, setAboutTitle] = useState('DEBUTFIT CLUB ATAKENT');
-  const [aboutDesc, setAboutDesc] = useState('Modern mimari, son teknoloji ekipmanlar ve profesyonel e\u011fitmen kadrosuyla donat\u0131lm\u0131\u015f premium tesisimizi ke\u015ffedin.');
+  const [aboutDesc, setAboutDesc] = useState('Modern mimari, son teknoloji ekipmanlar ve profesyonel eğitmen kadrosuyla donatılmış premium tesisimizi keşfedin.');
 
   // --- FAQ ---
   const [faqItems, setFaqItems] = useState([]);
@@ -151,11 +151,11 @@ export default function HomePage() {
           <div className="hero-text" data-aos="fade-right" data-aos-duration="1000">
             <div className="modern-badge">Neden DebutFit Club?</div>
             <h1 className="modern-title">
-              S&#305;radanl&#305;&#287;&#305; B&#305;rak, <br />
-              <span className="highlight-text">Zirveye Ula&#351;.</span>
+              Sıradanlığı Bırak, <br />
+              <span className="highlight-text">Zirveye Ulaş.</span>
             </h1>
             <p>
-              Biz sadece bir spor salonu de&#287;iliz; hedeflerine en h&#305;zl&#305; &#351;ekilde ula&#351;man i&#231;in tasarlanm&#305;&#351;, en &#252;st d&#252;zey (premium) ya&#351;am tarz&#305; merkeziyiz.
+              Biz sadece bir spor salonu değiliz; hedeflerine en hızlı şekilde ulaşman için tasarlanmış, en üst düzey (premium) yaşam tarzı merkeziyiz.
             </p>
             <div className="hero-buttons">
               <div className="primary-action-wrapper">
@@ -167,96 +167,95 @@ export default function HomePage() {
                   className="trial-link"
                   onClick={(e) => { e.preventDefault(); setTrialOpen(true); }}
                 >
-                  Veya Tesisimizi &#220;cretsiz Deneyin
+                  Veya Tesisimizi Ücretsiz Deneyin
                 </a>
               </div>
               <Link href="/tesis" className="secondary-btn">
-                Tesisimizi Ke&#351;fet
+                Tesisimizi Keşfet
               </Link>
             </div>
           </div>
 
           {/* Hero Slider */}
-          <div
-            ref={sliderContainerRef}
-            className={`hero-stats${isVideoMode ? ' video-mode' : ''}`}
-            id="heroSliderContainer"
-            data-aos="fade-left"
-            data-aos-duration="1000"
-            data-aos-delay="200"
-          >
-            {slides.length > 0 && (
-              <>
-                <div className="hero-slider-wrapper">
-                  {slides.map((slide, i) => (
-                    <div
-                      key={i}
-                      className={`hero-slide${i === currentSlide ? ' active' : ''}`}
-                    >
-                      {slide.type === 'video' ? (
-                        <video
-                          ref={(el) => { videoRefs.current[i] = el; }}
-                          src={slide.src}
-                          muted
-                          playsInline
-                          preload="none"
-                          style={{ width: '100%', display: 'block', borderRadius: 'inherit' }}
-                        />
-                      ) : (
-                        <img
-                          src={slide.src}
-                          alt={slide.title || 'DebutFit'}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 'inherit' }}
-                        />
-                      )}
-                      {slide.title && (
-                        <div className="hero-slide-caption glass-panel">
-                          <span>{slide.title}</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Nav arrows */}
-                {slides.length > 1 && (
-                  <>
-                    <button
-                      className="slider-arrow slider-prev"
-                      aria-label="Önceki slayt"
-                      onClick={() => {
-                        setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-                      }}
-                    >
-                      &#10094;
-                    </button>
-                    <button
-                      className="slider-arrow slider-next"
-                      aria-label="Sonraki slayt"
-                      onClick={() => {
-                        setCurrentSlide((prev) => (prev + 1) % slides.length);
-                      }}
-                    >
-                      &#10095;
-                    </button>
-                  </>
-                )}
-
-                {/* Dot indicators */}
-                {slides.length > 1 && (
-                  <div className="slider-dots">
-                    {slides.map((_, i) => (
-                      <button
+          <div data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+            <div
+              ref={sliderContainerRef}
+              className={`hero-stats${isVideoMode ? ' video-mode' : ''}`}
+              id="heroSliderContainer"
+            >
+              {slides.length > 0 && (
+                <>
+                  <div className="hero-slider-wrapper">
+                    {slides.map((slide, i) => (
+                      <div
                         key={i}
-                        className={`dot${i === currentSlide ? ' active' : ''}`}
-                        aria-label={`Slayt ${i + 1}`}
-                        onClick={() => setCurrentSlide(i)}
-                      />
+                        className={`hero-slide${i === currentSlide ? ' active' : ''}`}
+                      >
+                        {slide.type === 'video' ? (
+                          <video
+                            ref={(el) => { videoRefs.current[i] = el; }}
+                            src={slide.src}
+                            muted
+                            playsInline
+                            preload="none"
+                            style={{ width: '100%', display: 'block', borderRadius: 'inherit' }}
+                          />
+                        ) : (
+                          <img
+                            src={slide.src}
+                            alt={slide.title || 'DebutFit'}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 'inherit' }}
+                          />
+                        )}
+                        {slide.title && (
+                          <div className="hero-slide-caption glass-panel">
+                            <span>{slide.title}</span>
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
-                )}
-              </>
-            )}
+
+                  {/* Nav arrows */}
+                  {slides.length > 1 && (
+                    <>
+                      <button
+                        className="slider-arrow slider-prev"
+                        aria-label="Önceki slayt"
+                        onClick={() => {
+                          setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+                        }}
+                      >
+                        &#10094;
+                      </button>
+                      <button
+                        className="slider-arrow slider-next"
+                        aria-label="Sonraki slayt"
+                        onClick={() => {
+                          setCurrentSlide((prev) => (prev + 1) % slides.length);
+                        }}
+                      >
+                        &#10095;
+                      </button>
+                    </>
+                  )}
+
+                  {/* Dot indicators */}
+                  {slides.length > 1 && (
+                    <div className="slider-dots">
+                      {slides.map((_, i) => (
+                        <button
+                          key={i}
+                          className={`dot${i === currentSlide ? ' active' : ''}`}
+                          aria-label={`Slayt ${i + 1}`}
+                          onClick={() => setCurrentSlide(i)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -302,8 +301,8 @@ export default function HomePage() {
       <section id="programs" className="services-summary-section">
         <div className="container">
           <div className="section-header" data-aos="fade-up" data-aos-duration="800">
-            <h2>{"ÖNE ÇIKAN"} <span className="highlight">PROGRAMLAR</span></h2>
-            <p>{"Hedefin ne olursa olsun, sana uygun bir antrenman programımız mutlaka var."}</p>
+            <h2>ÖNE ÇIKAN <span className="highlight">PROGRAMLAR</span></h2>
+            <p>Hedefin ne olursa olsun, sana uygun bir antrenman programımız mutlaka var.</p>
             <div className="header-line"></div>
           </div>
 
@@ -324,8 +323,8 @@ export default function HomePage() {
                     <path d="M6.5 6.5h11M6.5 17.5h11M3.5 11v2M20.5 11v2M5.5 8.5v7M18.5 8.5v7M9 5v14M15 5v14" />
                   </svg>
                 </div>
-                <h3>{"Fitness & Vücut Geliştirme"}</h3>
-                <p>{"Serbest ağırlıklar ve en yeni makinelerle kas kütleni artır veya sıkılaş."}</p>
+                <h3>Fitness & Vücut Geliştirme</h3>
+                <p>Serbest ağırlıklar ve en yeni makinelerle kas kütleni artır veya sıkılaş.</p>
               </div>
             </div>
 
@@ -347,8 +346,8 @@ export default function HomePage() {
                     <circle cx="12" cy="12" r="2" />
                   </svg>
                 </div>
-                <h3>{"Kick Boks & MMA"}</h3>
-                <p>{"Kondisyonunu zirveye taşı, stresi at ve profesyonellerden dövüş sanatlarını öğren."}</p>
+                <h3>Kick Boks & MMA</h3>
+                <p>Kondisyonunu zirveye taşı, stresi at ve profesyonellerden dövüş sanatlarını öğren.</p>
               </div>
             </div>
 
@@ -368,8 +367,8 @@ export default function HomePage() {
                     <path d="M12 2.5a4.5 4.5 0 0 0-4.5 4.5v1h9v-1a4.5 4.5 0 0 0-4.5-4.5zM7 10h10v4a5 5 0 0 1-10 0v-4zM4 14.5a3.5 3.5 0 0 0 7 0M13 14.5a3.5 3.5 0 0 0 7 0" />
                   </svg>
                 </div>
-                <h3>{"Pilates & Yoga"}</h3>
-                <p>{"Esnekliğini artır, postürünü düzelt ve zihin-beden dengeni mükemmelleştir."}</p>
+                <h3>Pilates & Yoga</h3>
+                <p>Esnekliğini artır, postürünü düzelt ve zihin-beden dengeni mükemmelleştir.</p>
               </div>
             </div>
 
@@ -391,14 +390,14 @@ export default function HomePage() {
                   </svg>
                 </div>
                 <h3>Personal Training</h3>
-                <p>{"Sadece sana özel hazırlanan beslenme ve antrenman programlarıyla kesin sonuç al."}</p>
+                <p>Sadece sana özel hazırlanan beslenme ve antrenman programlarıyla kesin sonuç al.</p>
               </div>
             </div>
           </div>
 
           <div className="services-footer" data-aos="fade-in" data-aos-delay="500">
             <Link href="/programlar" className="login-btn-animated" style={{ display: 'inline-block', textDecoration: 'none' }}>
-              {"Tüm Programları İncele"}
+              Tüm Programları İncele
             </Link>
           </div>
         </div>
