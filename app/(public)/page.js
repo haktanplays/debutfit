@@ -81,10 +81,11 @@ export default function HomePage() {
     const slide = slides[index];
     if (!slide) return;
 
-    // Pause all videos first
+    // Pause all videos and clear their onended handlers
     Object.values(videoRefs.current).forEach((v) => {
       if (v) {
         v.pause();
+        v.onended = null;
         v.currentTime = 0;
       }
     });
@@ -109,6 +110,9 @@ export default function HomePage() {
     }
     return () => {
       if (heroSlideTimeout.current) clearTimeout(heroSlideTimeout.current);
+      Object.values(videoRefs.current).forEach((v) => {
+        if (v) v.onended = null;
+      });
     };
   }, [currentSlide, slides, loaded, startSlideTimer]);
 
