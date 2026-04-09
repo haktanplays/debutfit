@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useModal } from '@/components/ModalProvider';
 import { getSliderItems, getSiteSetting, getFaqItems, getPublicUrl } from '@/lib/db';
 
@@ -199,12 +198,10 @@ export default function HomePage() {
                           style={{ width: '100%', display: 'block', borderRadius: 'inherit' }}
                         />
                       ) : (
-                        <Image
+                        <img
                           src={slide.src}
                           alt={slide.title || 'DebutFit'}
-                          fill
-                          sizes="420px"
-                          style={{ objectFit: 'cover', borderRadius: 'inherit' }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 'inherit' }}
                         />
                       )}
                       {slide.title && (

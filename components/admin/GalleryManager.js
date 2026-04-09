@@ -93,25 +93,25 @@ export default function GalleryManager() {
 
   return (
     <div>
-      <h2 style={{ color: '#fff', fontSize: '24px', fontWeight: 700, marginBottom: '20px' }}>Gallery Manager</h2>
+      <h2 style={{ color: '#fff', fontSize: '24px', fontWeight: 700, marginBottom: '20px' }}>Galeri Yonetimi</h2>
 
       <div style={adminCardStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h3 style={{ color: '#FF8C00', fontSize: '16px' }}>Albums ({albums.length})</h3>
-          <button onClick={() => openModal()} style={adminBtnStyle}>+ Add Album</button>
+          <h3 style={{ color: '#FF8C00', fontSize: '16px' }}>Albumler ({albums.length})</h3>
+          <button onClick={() => openModal()} style={adminBtnStyle}>+ Album Ekle</button>
         </div>
 
         {albums.length === 0 ? (
-          <p style={{ color: '#666' }}>No albums yet.</p>
+          <p style={{ color: '#666' }}>Henuz album eklenmedi.</p>
         ) : (
           <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
             <thead>
               <tr>
-                <th style={adminThStyle}>Cover</th>
-                <th style={adminThStyle}>Title</th>
-                <th style={adminThStyle}>Photos</th>
-                <th style={adminThStyle}>Actions</th>
+                <th style={adminThStyle}>Kapak</th>
+                <th style={adminThStyle}>Baslik</th>
+                <th style={adminThStyle}>Fotograf</th>
+                <th style={adminThStyle}>Islemler</th>
               </tr>
             </thead>
             <tbody>
@@ -121,7 +121,7 @@ export default function GalleryManager() {
                     {album.cover_path ? (
                       <img src={getPublicUrl(album.cover_path)} alt="" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} />
                     ) : (
-                      <span style={{ color: '#666' }}>No cover</span>
+                      <span style={{ color: '#666' }}>Kapak yok</span>
                     )}
                   </td>
                   <td style={adminTdStyle}>{album.title}</td>
@@ -129,10 +129,10 @@ export default function GalleryManager() {
                   <td style={adminTdStyle}>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button onClick={() => openModal(album.id)} style={{ ...adminBtnStyle, padding: '6px 14px', fontSize: '12px', background: '#333' }}>
-                        Edit
+                        Duzenle
                       </button>
                       <button onClick={() => handleDeleteAlbum(album.id)} style={{ ...adminBtnStyle, padding: '6px 14px', fontSize: '12px', background: '#c0392b' }}>
-                        Delete
+                        Sil
                       </button>
                     </div>
                   </td>
@@ -149,32 +149,32 @@ export default function GalleryManager() {
         <div style={overlayStyle} onClick={() => setModalOpen(false)}>
           <div style={modalStyle} onClick={e => e.stopPropagation()}>
             <h3 style={{ color: '#FF8C00', fontSize: '18px', marginBottom: '20px' }}>
-              {editId ? 'Edit Album' : 'Add Album'}
+              {editId ? 'Albumu Duzenle' : 'Album Ekle'}
             </h3>
             <form onSubmit={handleSave}>
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>Title *</label>
-                <input style={adminInputStyle} value={title} onChange={e => setTitle(e.target.value)} placeholder="Album title" required />
+                <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>Baslik *</label>
+                <input style={adminInputStyle} value={title} onChange={e => setTitle(e.target.value)} placeholder="Album baslik" required />
               </div>
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>Description</label>
+                <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>Aciklama</label>
                 <textarea
                   style={{ ...adminInputStyle, minHeight: '80px', resize: 'vertical' }}
                   value={desc}
                   onChange={e => setDesc(e.target.value)}
-                  placeholder="Album description"
+                  placeholder="Album aciklama"
                 />
               </div>
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>Author (optional)</label>
-                <input style={adminInputStyle} value={author} onChange={e => setAuthor(e.target.value)} placeholder="Photographer name" />
+                <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>Fotografci (opsiyonel)</label>
+                <input style={adminInputStyle} value={author} onChange={e => setAuthor(e.target.value)} placeholder="Fotografci adi" />
               </div>
 
               {/* Existing photos */}
               {existingPhotos.length > 0 && (
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '8px' }}>
-                    Current Photos ({existingPhotos.length})
+                    Mevcut Fotograflar ({existingPhotos.length})
                   </label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {existingPhotos.map((photo) => (
@@ -200,15 +200,15 @@ export default function GalleryManager() {
 
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', color: '#ccc', fontSize: '13px', marginBottom: '6px' }}>
-                  {editId ? 'Add More Photos' : 'Upload Photos'}
+                  {editId ? 'Fotograf Ekle' : 'Fotograf Yukle'}
                 </label>
                 <input type="file" accept="image/*" multiple style={{ color: '#ccc', fontSize: '13px' }} />
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setModalOpen(false)} style={{ ...adminBtnStyle, background: '#333' }}>Cancel</button>
+                <button type="button" onClick={() => setModalOpen(false)} style={{ ...adminBtnStyle, background: '#333' }}>Iptal</button>
                 <button type="submit" disabled={processing} style={{ ...adminBtnStyle, opacity: processing ? 0.6 : 1 }}>
-                  {processing ? 'Processing...' : editId ? 'Update' : 'Add'}
+                  {processing ? 'Isleniyor...' : editId ? 'Guncelle' : 'Ekle'}
                 </button>
               </div>
             </form>

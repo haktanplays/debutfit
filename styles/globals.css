@@ -603,7 +603,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 }
 
 .hero-slide {
-    position: absolute !important;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
