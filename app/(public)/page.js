@@ -210,14 +210,14 @@ export default function HomePage() {
                           src={slide.src}
                           muted
                           playsInline
-                          preload="none"
-                          style={{ width: '100%', display: 'block', borderRadius: 'inherit' }}
+                          preload="metadata"
+                          style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 'inherit' }}
                         />
                       ) : (
                         <img
                           src={slide.src}
                           alt={slide.title || 'DebutFit'}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 'inherit' }}
+                          style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 'inherit' }}
                         />
                       )}
                       {slide.title && (

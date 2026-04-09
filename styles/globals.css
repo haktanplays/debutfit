@@ -590,42 +590,39 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     gap: 15px; /* Fotoğraflar ve noktalar arasındaki boşluk */
 }
 
+/* Ana kapsayıcı dinamik yükseklik alacak */
 .hero-slider-wrapper {
     position: relative;
     width: 100%;
-    height: 460px; /* Yükseklik kesin olarak sabitlendi */
-    flex-shrink: 0; /* Flexbox'ın bu kutuyu küçültmesi/çökertmesi yasaklandı */
-    border-radius: 20px;
     overflow: hidden;
+    display: block;
+    border-radius: 20px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.5);
     border: 1px solid rgba(255,255,255,0.2);
     background: #1a1a1a;
 }
 
+/* Tüm slaytlar varsayılan olarak yer kaplamaz (absolute) ve gizlidir */
 .hero-slide {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out, transform 0.8s ease-in-out;
-    transform: scale(1.05);
-    z-index: 1;
+    transition: opacity 0.5s ease-in-out;
 }
 
+/* SADECE aktif olan slayt yer kaplar (relative) ve wrapper'ı esnetir! */
 .hero-slide.active {
+    position: relative;
     opacity: 1;
     visibility: visible;
-    transform: scale(1);
-    z-index: 2;
 }
 
 .hero-slide img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
     display: block;
 }
 
@@ -1026,7 +1023,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     }
 
     .hero-slider-wrapper {
-        height: 350px; /* Mobilde fotoğrafı biraz kısaltıyoruz */
+        /* Dinamik yükseklik - içerik belirler */
     }
     
     .hero-slide img {
@@ -1381,7 +1378,7 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     .section-header h2 { font-size: 28px; letter-spacing: 1px; }
     .section-header p { font-size: 15px; }
     #heroSliderContainer { height: auto; min-height: 280px; }
-    .hero-slider-wrapper { height: 280px; }
+    .hero-slider-wrapper { /* Dinamik yükseklik */ }
     .faq-title { padding: 16px 15px; font-size: 16px; }
     .faq-content p { padding: 0 15px 20px 15px; font-size: 14px; }
     .slider-arrow { width: 44px; height: 44px; font-size: 18px; }
