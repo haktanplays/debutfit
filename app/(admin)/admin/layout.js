@@ -48,16 +48,16 @@ function AdminLayoutInner({ children }) {
 
         .data-table { width: 100%; border-collapse: collapse; background: #1a1a1a; border-radius: 8px; overflow: hidden; }
         .data-table th, .data-table td { padding: 15px 20px; text-align: left; border-bottom: 1px solid #333; }
-        .data-table th { background: #222; color: #FF8C00; font-weight: 700; text-transform: uppercase; font-size: 13px; }
-        .data-table td { color: #ccc; font-size: 14px; vertical-align: middle; word-break: break-word; overflow-wrap: break-word; white-space: normal; max-width: 300px; }
+        .data-table th { background: #222; color: #FF8C00; font-weight: 700; text-transform: uppercase; font-size: 13px; white-space: nowrap; }
+        .data-table td { color: #ccc; font-size: 14px; vertical-align: middle; overflow-wrap: break-word; white-space: normal; max-width: 300px; }
         .prog-img-preview { width: 60px; height: 40px; object-fit: cover; border-radius: 4px; }
 
         .action-btns { white-space: nowrap; }
         .action-btns button { margin-right: 8px; }
         .action-btns button:last-child { margin-right: 0; }
-        .edit-btn { background: #00C06B; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; transition: 0.3s; }
+        .edit-btn { background: #00C06B; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; transition: 0.3s; white-space: nowrap; }
         .edit-btn:hover { background: #009e58; }
-        .delete-btn { background: #ff4444; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; transition: 0.3s; }
+        .delete-btn { background: #ff4444; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; transition: 0.3s; white-space: nowrap; }
         .delete-btn:hover { background: #cc0000; }
 
         .admin-modal { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }

@@ -7,7 +7,7 @@ import 'cropperjs/dist/cropper.css';
 const adminCardStyle = { background: '#1e1e1e', borderRadius: '12px', padding: '30px', border: '1px solid #333', marginBottom: '30px' };
 const adminInputStyle = { width: '100%', padding: '12px', background: '#2a2a2a', border: '1px solid #444', borderRadius: '8px', color: '#fff', fontSize: '14px' };
 const adminBtnStyle = { padding: '12px 24px', background: '#FF8C00', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, fontSize: '14px' };
-const adminThStyle = { padding: '12px', textAlign: 'left', borderBottom: '2px solid #FF8C00', color: '#FF8C00', fontSize: '13px', textTransform: 'uppercase' };
+const adminThStyle = { padding: '12px', textAlign: 'left', borderBottom: '2px solid #FF8C00', color: '#FF8C00', fontSize: '13px', textTransform: 'uppercase', whiteSpace: 'nowrap' };
 const adminTdStyle = { padding: '12px', borderBottom: '1px solid #333', color: '#ccc', fontSize: '14px' };
 
 const overlayStyle = {
@@ -123,7 +123,8 @@ export default function FacilityManager() {
         {items.length === 0 ? (
           <p style={{ color: '#666' }}>Henuz tesis imkani eklenmedi.</p>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
             <thead>
               <tr>
                 <th style={adminThStyle}>Gorsel</th>
@@ -150,6 +151,7 @@ export default function FacilityManager() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 
