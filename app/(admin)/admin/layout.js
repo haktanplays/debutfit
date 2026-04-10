@@ -32,9 +32,8 @@ function AdminLayoutInner({ children }) {
         .admin-menu-item { padding: 15px 25px; color: #aaa; text-decoration: none; display: flex; align-items: center; gap: 15px; font-weight: 600; transition: all 0.3s; border-left: 4px solid transparent; cursor: pointer; font-size: 14px; }
         .admin-menu-item:hover, .admin-menu-item.active { background-color: rgba(255, 140, 0, 0.1); color: #FF8C00; border-left-color: #FF8C00; }
         .admin-menu-item svg { width: 20px; height: 20px; min-width: 20px; }
-        .admin-logout-btn { padding: 20px; text-align: center; border-top: 1px solid #333; flex-shrink: 0; min-height: 60px; }
-        .admin-logout-btn a { color: #ff4444; text-decoration: none; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
-        .admin-logout-btn a:hover { color: #ff0000; transform: translateX(5px); }
+        .admin-menu-logout { color: #ff4444 !important; border-top: 1px solid #333; margin-top: 10px; }
+        .admin-menu-logout:hover { color: #ff0000 !important; background-color: rgba(255, 68, 68, 0.1) !important; border-left-color: #ff4444 !important; }
 
         .admin-main-content { flex: 1; display: flex; flex-direction: column; background-color: #0f0f0f; overflow-y: auto; }
         .admin-top-header { padding: 20px 40px; background-color: #121212; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; position: relative; top: auto; z-index: auto; width: auto; backdrop-filter: none; box-shadow: none; }
@@ -109,7 +108,6 @@ function AdminLayoutInner({ children }) {
           }
           .admin-sidebar.open { left: 0; }
           .admin-sidebar .admin-menu { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-          .admin-sidebar .admin-logout-btn { position: sticky; bottom: 0; background: #121212; border-top: 1px solid #333; padding: 15px 20px; flex-shrink: 0; }
           .mobile-menu-toggle { display: block; }
           .close-admin-menu { display: block !important; }
           .stats-grid { grid-template-columns: 1fr; }
@@ -156,18 +154,18 @@ function AdminLayoutInner({ children }) {
                 {item.label}
               </div>
             ))}
-          </div>
-          <div className="admin-logout-btn">
-            <a href="#" onClick={async (e) => {
-              e.preventDefault();
-              const { createClient } = await import('@/lib/supabase-client');
-              const supabase = createClient();
-              await supabase.auth.signOut();
-              window.location.href = '/';
-            }}>
-              <svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <div
+              className="admin-menu-item admin-menu-logout"
+              onClick={async () => {
+                const { createClient } = await import('@/lib/supabase-client');
+                const supabase = createClient();
+                await supabase.auth.signOut();
+                window.location.href = '/';
+              }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
               Cikis Yap
-            </a>
+            </div>
           </div>
         </aside>
 

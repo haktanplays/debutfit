@@ -287,7 +287,7 @@ export default function HomePage() {
           </div>
 
           {/* FAQ Accordion */}
-          <div className="faq-container" data-aos="fade-up" data-aos-delay="200">
+          <div id="faq" className="faq-container" data-aos="fade-up" data-aos-delay="200">
             {faqItems.map((item, index) => (
               <div
                 key={index}

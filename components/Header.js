@@ -72,7 +72,7 @@ export default function Header() {
         <button className="close-menu-btn" id="closeMenuBtn" type="button" aria-label="Menüyü kapat" onClick={() => setMenuOpen(false)}>&times;</button>
         <ul>
           <li><Link href="/" className="nav-link" onClick={() => setMenuOpen(false)}>Ana Sayfa</Link></li>
-          <li><Link href="/#about" className="nav-link" onClick={() => setMenuOpen(false)}>Hakkımızda</Link></li>
+          <li><Link href="/#faq" className="nav-link" onClick={() => setMenuOpen(false)}>Hakkımızda</Link></li>
           <li><Link href="/tesis" className="nav-link" onClick={() => setMenuOpen(false)}>Tesisimiz</Link></li>
           <li><Link href="/programlar" className="nav-link" onClick={() => setMenuOpen(false)}>Programlar</Link></li>
           <li><Link href="/galeri" className="nav-link" onClick={() => setMenuOpen(false)}>Galeri</Link></li>
