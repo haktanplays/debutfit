@@ -14,6 +14,7 @@ export default function ProgramManager() {
   const cropperRef = useRef(null);
   const imgRef = useRef(null);
   const [showCropper, setShowCropper] = useState(false);
+  const pendingImageData = useRef(null);
 
   const loadPrograms = async () => {
     try {
@@ -55,21 +56,29 @@ export default function ProgramManager() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      if (cropperRef.current) cropperRef.current.destroy();
-      if (imgRef.current) {
-        imgRef.current.src = ev.target.result;
-        setShowCropper(true);
-        setTimeout(() => {
+      if (cropperRef.current) { cropperRef.current.destroy(); cropperRef.current = null; }
+      pendingImageData.current = ev.target.result;
+      setShowCropper(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  useEffect(() => {
+    if (showCropper && pendingImageData.current && imgRef.current) {
+      imgRef.current.src = pendingImageData.current;
+      pendingImageData.current = null;
+      if (cropperRef.current) { cropperRef.current.destroy(); cropperRef.current = null; }
+      setTimeout(() => {
+        if (imgRef.current) {
           cropperRef.current = new Cropper(imgRef.current, {
             aspectRatio: 280 / 180,
             viewMode: 1,
             autoCropArea: 1,
           });
-        }, 100);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
+        }
+      }, 100);
+    }
+  }, [showCropper]);
 
   const handleSave = async (e) => {
     e.preventDefault();

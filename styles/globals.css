@@ -390,9 +390,9 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     background-color: transparent;
     border-radius: 15px;
     height: 350px;
+    -webkit-perspective: 1000px;
     perspective: 1000px;
     cursor: pointer;
-    transform-style: preserve-3d;
 }
 
 /* Ön ve Arkayı Tutan İç Kutu */
@@ -401,18 +401,23 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
     width: 100%;
     height: 100%;
     text-align: center;
-    transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); /* Dönüş hızı ve yumuşaklığı */
+    -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+    transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+    -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
 }
 
 /* Tıklandığında (.flipped eklendiğinde) Kartı Döndür */
 .pg-card.flipped .pg-card-inner {
+    -webkit-transform: rotateY(180deg);
     transform: rotateY(180deg);
 }
 
 /* Ön ve Arka Yüzün Ortak Ayarları */
 .pg-card-front, .pg-card-back {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     -webkit-backface-visibility: hidden;
@@ -426,6 +431,18 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 /* --- KARTIN ÖN YÜZÜ (service-card tarzı) --- */
 .pg-card-front {
     background-color: #1a1a1a;
+    z-index: 2;
+}
+
+/* Safari backface-visibility fix: visibility toggle */
+.pg-card.flipped .pg-card-front {
+    visibility: hidden;
+}
+.pg-card-back {
+    z-index: 1;
+}
+.pg-card.flipped .pg-card-back {
+    visibility: visible;
 }
 
 .pg-card-front .card-bg-img {
@@ -447,10 +464,11 @@ nav ul { list-style: none; display: flex; align-items: center; gap: 30px; }
 
 /* --- KARTIN ARKA YÜZÜ (Açıklama Kısmı) --- */
 .pg-card-back {
-    background-color: #1a1a1a; /* Sitenin temasına uygun koyu gri */
-    border: 2px solid var(--accent-orange); /* Turuncu şık kenarlık */
+    background-color: #1a1a1a;
+    border: 2px solid var(--accent-orange);
     color: white;
-    transform: rotateY(180deg); /* Başlangıçta arkaya dönük dursun */
+    -webkit-transform: rotateY(180deg);
+    transform: rotateY(180deg);
     display: flex;
     flex-direction: column;
     justify-content: center;

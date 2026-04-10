@@ -44,7 +44,7 @@ export default function ProgramlarPage() {
               <div key={p.id} className={`pg-card ${flipped[p.id] ? 'flipped' : ''}`} onClick={() => toggleFlip(p.id)}>
                 <div className="pg-card-inner">
                   <div className="pg-card-front">
-                    {p.image_path ? (
+                    {p.image_path && p.image_path.trim() ? (
                       <img src={getPublicUrl(p.image_path)} alt={p.name} className="card-bg-img" />
                     ) : (
                       <div className="card-bg-img" style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #333 100%)' }} />
